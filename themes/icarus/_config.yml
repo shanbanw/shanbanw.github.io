@@ -1,0 +1,77 @@
+#title: Data Miner
+# Menus
+menu:
+  Home: .
+  Archives: archives
+  #Categories: categories
+  #Tags: tags
+  #About: about
+
+# Customize
+customize:
+    logo:
+        enabled: true
+        width: 40
+        height: 40
+        url: images/deeplearning.jpg
+    profile:
+        enabled: true # Whether to show profile bar
+        avatar: css/images/qimu.png
+        gravatar: # Gravatar email address, if you enable Gravatar, your avatar config will be overriden
+        author: shanbanw
+        author_title: Algorithm Engineer
+        location: Beijing, China
+        follow: https://github.com/shanbanw/
+    highlight: tomorrow
+    sidebar: right # sidebar position, options: left, right
+    thumbnail: true # enable posts thumbnail, options: true, false
+    favicon: css/images/zhaoqiao.ico # path to favicontitle: Data Miner
+    social_links:
+        github: http://github.com/shanbanw/
+        twitter: /
+        facebook: /
+        dribbble: /
+        rss: /
+    social_link_tooltip: true # enable the social link tooltip, options: true, false
+    #title: Data Miner
+# Widgets
+widgets:
+    - recent_posts
+    - category
+    - archive
+    - tag
+    - tagcloud
+    #- links
+
+# Search
+search:
+    insight: true # you need to install `hexo-generator-json-content` before using Insight Search
+    swiftype: false # enter swiftype install key here
+    baidu: false # you need to disable other search engines to use Baidu search, options: true, false
+
+# Comment
+comment:
+    disqus: #hexo-theme-icarus # enter disqus shortname here
+    duoshuo: true # enter duoshuo shortname here
+    youyan: # enter youyan uid here
+
+# Share
+share: default # options: jiathis, bdshare, addtoany, default
+
+# Plugins
+plugins:
+    lightgallery: true # options: true, false
+    justifiedgallery: true # options: true, false
+    google_analytics: # enter the tracking ID for your Google Analytics
+    google_site_verification: # enter Google site verification code
+    baidu_analytics: true # enter Baidu Analytics hash key
+
+# Miscellaneous
+miscellaneous:
+    open_graph: # see http://ogp.me
+        fb_app_id:
+        fb_admins:
+        twitter_id:
+        google_plus:
+    links:
+        mtpgm: http://mtpgm.com
