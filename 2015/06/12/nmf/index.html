@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset="utf-8">
+    
+    <title>非负矩阵分解（NMF） | Game Programming</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="非负矩阵分解能够学习到对象的局部特征，例如把人脸分解成嘴巴，眼睛，鼻子等等不同的部分，在很多领域都有重要的应用，例如文本聚类，语音处理，协同过滤。其主要思想是把一个大的非负矩阵X分解为两个小矩阵（WH）的乘积，满足这两个小矩阵所有元素都不为负值的条件，即X&#x3D;WH。然而完全相等很难实现，所以我们只要求能够充分接近就可以了。这时需要一个代价函数（cost function）来表示两者的差距。一种代价函">
+<meta property="og:type" content="article">
+<meta property="og:title" content="非负矩阵分解（NMF）">
+<meta property="og:url" content="http://mtpgm.com/2015/06/12/nmf/index.html">
+<meta property="og:site_name" content="Game Programming">
+<meta property="og:description" content="非负矩阵分解能够学习到对象的局部特征，例如把人脸分解成嘴巴，眼睛，鼻子等等不同的部分，在很多领域都有重要的应用，例如文本聚类，语音处理，协同过滤。其主要思想是把一个大的非负矩阵X分解为两个小矩阵（WH）的乘积，满足这两个小矩阵所有元素都不为负值的条件，即X&#x3D;WH。然而完全相等很难实现，所以我们只要求能够充分接近就可以了。这时需要一个代价函数（cost function）来表示两者的差距。一种代价函">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2015-06-12T15:12:26.000Z">
+<meta property="article:modified_time" content="2016-12-30T19:35:31.155Z">
+<meta property="article:author" content="mtpgm">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+    
+
+    
+        <link rel="alternate" href="/" title="Game Programming" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/zhaoqiao.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?true";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+	<!-- syntaxhighlighter -->
+	<script type="text/javascript" src="/js/shCore.js"></script>
+	<link type="text/css" rel="stylesheet" href="/js/shCore.css"/>
+	<link type="text/css" rel="stylesheet" href="/js/shThemeDefault.css"/>
+	<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+	<script type="text/javascript" src="/js/shBrushPython.js"></script>
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Game Programming</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/qimu.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/qimu.png" />
+            <h2 id="name">bjshan</h2>
+            <h3 id="title">Algorithm Engineer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Beijing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/banjshan/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                10
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                7
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/banjshan/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-nmf" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            非负矩阵分解（NMF）
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2015/06/12/nmf/">
+            <time datetime="2015-06-12T15:12:26.000Z" itemprop="datePublished">2015-06-12</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>非负矩阵分解能够学习到对象的局部特征，例如把人脸分解成嘴巴，眼睛，鼻子等等不同的部分，在很多领域都有重要的应用，例如文本聚类，语音处理，协同过滤。其主要思想是把一个大的非负矩阵X分解为两个小矩阵（WH）的乘积，满足这两个小矩阵所有元素都不为负值的条件，即X=WH。然而完全相等很难实现，所以我们只要求能够充分接近就可以了。这时需要一个代价函数（cost function）来表示两者的差距。一种代价函数是基于欧式距离的，一种是分离度的，两个都有对应的迭代公式。  <span id="more"></span><br>介绍NMF算法的文章已经有很多了，本文主要介绍一下非负矩阵分解在分析癌症突变异质性中的作用。数据来自于nature论文 ——Mutational heterogeneity in cancer and the search for new cancer-associated genes ——的附表S3，是对2892个癌症病人的96中突变类型的统计。论文分析的是3083个癌症病人的数据，而附表S3只提供了突变个数在10个以上的数据，只有2892个病人，因此不求能够得到和论文完全一致的结果。现在的数据是每个癌症样本在96种突变类型上的分布，通过非负矩阵分解，我们期望得到每个样本在不同的突变谱上的分布，所谓突变谱就是把几个突变类型综合在一起的形式，例如*CpG岛处的突变代表了一些C参与的突变类型。下图为论文中找到的6个突变谱，包含了目前已知的突变过程。</p>
+<div class="justified-gallery">![legoplot-paper](/img/legoplot-paper.jpg)</div>
+数据归一化：某个样本的某种类型的突变可能是由于这种类型的突变的测序覆盖度比较好导致的，因此需要对每种突变类型进行归一化处理。对每个样本s和突变类型c，定义\\({n\_{cs}}\\)为观察到的突变数，\\({N\_{cs}}\\)为具有足够覆盖度碱基数，则样本总的突变频率为$\mu \_s=\sum \_c{n\_{cs}} / \sum \_c{N\_{cs}}$，每种突变的相对突变率$R\_{cs}=\(n\_{cs}/N\_{cs}\)/\mu\_s$，接着可以对$R\_{cs}$矩阵进行非负矩阵分解。论文中并没有提供每个样本的每种突变类型的碱基数，只给了所有样本的平均值，所以这次计算用了这种并不合适的数据。  
+R code:  
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">coverage &lt;- read.table(<span class="string">&#x27;coverage.txt&#x27;</span>,header=<span class="built_in">F</span>)[-<span class="number">1</span>]  </span><br><span class="line">mutation &lt;- read.csv(<span class="string">&#x27;table_s3.csv&#x27;</span>,header=<span class="literal">TRUE</span>, row.names=<span class="string">&#x27;name&#x27;</span>,stringsAsFactors=<span class="literal">FALSE</span>)  </span><br><span class="line">mutation.spe &lt;- as.matrix(mutation[,<span class="number">2</span>:<span class="number">97</span>])  </span><br><span class="line">mutation.spectrum &lt;- matrix(<span class="number">0</span>,nrow=<span class="number">2892</span>,ncol=<span class="number">96</span>,<span class="built_in">dimnames</span>=<span class="built_in">dimnames</span>(mutation.spe))  </span><br><span class="line">samlength=<span class="built_in">rep</span>(<span class="number">0</span>,<span class="number">2892</span>)  </span><br><span class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:nrow(mutation.spe))&#123;  </span><br><span class="line">  mius=<span class="built_in">sum</span>(mutation.spe[i,])/<span class="built_in">sum</span>(coverage)  </span><br><span class="line">  samlength[i]=mius*<span class="number">1000000</span>  </span><br><span class="line">  mutation.spectrum[i,]=as.matrix((mutation.spe[i,]/coverage)/mius)  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+使用R包NMF进行矩阵分解，rank=6，nrun=50
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line">library(NMF)</span><br><span class="line">spectrum.fit &lt;- nmf(mutation.spectrum, <span class="number">6</span>, nrun=<span class="number">50</span>)</span><br><span class="line">spectrum.coef &lt;- coef(spectrum.fit)</span><br><span class="line"><span class="comment">#spectrum.basis &lt;- t(spectrum.basis)</span></span><br><span class="line"></span><br><span class="line">basematrix &lt;- <span class="keyword">function</span>(factor,base1,base2)&#123;</span><br><span class="line">  base &lt;- <span class="built_in">rep</span>(<span class="number">0</span>,<span class="number">16</span>)</span><br><span class="line">  index=<span class="number">1</span></span><br><span class="line">  <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="built_in">c</span>(<span class="string">&#x27;T&#x27;</span>,<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;A&#x27;</span>,<span class="string">&#x27;G&#x27;</span>))&#123;</span><br><span class="line">    <span class="keyword">for</span> (j <span class="keyword">in</span> <span class="built_in">c</span>(<span class="string">&#x27;T&#x27;</span>,<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;A&#x27;</span>,<span class="string">&#x27;G&#x27;</span>))&#123;</span><br><span class="line">      name=paste0(i,base1,j,<span class="string">&#x27;to&#x27;</span>,i,base2,j)</span><br><span class="line">      base[index]=factor[name]</span><br><span class="line">      index=index+<span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span>(matrix(base,nrow=<span class="number">4</span>,byrow=<span class="built_in">T</span>))     </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">combinebase &lt;- <span class="keyword">function</span>(index)&#123;</span><br><span class="line">  CG = basematrix(spectrum.coef[index,],<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;G&#x27;</span>)</span><br><span class="line">  CA = basematrix(spectrum.coef[index,],<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;A&#x27;</span>)</span><br><span class="line">  CT = basematrix(spectrum.coef[index,],<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;T&#x27;</span>)</span><br><span class="line">  AT = basematrix(spectrum.coef[index,],<span class="string">&#x27;A&#x27;</span>,<span class="string">&#x27;T&#x27;</span>)</span><br><span class="line">  AC = basematrix(spectrum.coef[index,],<span class="string">&#x27;A&#x27;</span>,<span class="string">&#x27;C&#x27;</span>)</span><br><span class="line">  AG = basematrix(spectrum.coef[index,],<span class="string">&#x27;A&#x27;</span>,<span class="string">&#x27;G&#x27;</span>)</span><br><span class="line">  <span class="built_in">return</span>(cbind(rbind(CG,AT),rbind(CA,AC),rbind(CT,AG)))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">par(mfrow=<span class="built_in">c</span>(<span class="number">2</span>,<span class="number">3</span>),mar=<span class="built_in">c</span>(<span class="number">2</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">2</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">#plot</span></span><br><span class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">6</span>)&#123;</span><br><span class="line">  data = combinebase(i)</span><br><span class="line">  </span><br><span class="line">  data=data/<span class="built_in">max</span>(data)</span><br><span class="line">  </span><br><span class="line">  <span class="comment"># generate &#x27;empty&#x27; persp plot</span></span><br><span class="line">  pmat = persp(x=<span class="built_in">c</span>(<span class="number">0</span>,<span class="number">10</span>), y=<span class="built_in">c</span>(<span class="number">0</span>,<span class="number">10</span>), z=matrix(<span class="built_in">c</span>(<span class="number">0</span>,<span class="number">.001</span>,<span class="number">0</span>,<span class="number">.001</span>), nrow=<span class="number">2</span>), </span><br><span class="line">               xlim=<span class="built_in">c</span>(<span class="number">0</span>,<span class="number">10</span>), ylim=<span class="built_in">c</span>(<span class="number">0</span>,<span class="number">10</span>), zlim=<span class="built_in">c</span>(<span class="number">0</span>,<span class="number">1.5</span>), </span><br><span class="line">               theta=<span class="number">60</span>, phi=<span class="number">25</span>, d=<span class="number">5</span>, box=<span class="built_in">F</span>,border=<span class="literal">NA</span>) </span><br><span class="line">  </span><br><span class="line">  <span class="comment"># define color ramp</span></span><br><span class="line">  colorCG = matrix(<span class="built_in">rep</span>(<span class="string">&#x27;#FF0000&#x27;</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</span><br><span class="line">  colorAT = matrix(<span class="built_in">rep</span>(<span class="string">&#x27;#7F4CB2&#x27;</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</span><br><span class="line">  colorCA = matrix(<span class="built_in">rep</span>(<span class="string">&#x27;#00B2B2&#x27;</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</span><br><span class="line">  colorAC = matrix(<span class="built_in">rep</span>(<span class="string">&#x27;#0033CC&#x27;</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</span><br><span class="line">  colorCT = matrix(<span class="built_in">rep</span>(<span class="string">&#x27;#FFFF00&#x27;</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</span><br><span class="line">  colorAG = matrix(<span class="built_in">rep</span>(<span class="string">&#x27;#19CC19&#x27;</span>,<span class="number">16</span>),nrow=<span class="number">4</span>)</span><br><span class="line">  </span><br><span class="line">  colorM = cbind(rbind(colorCG,colorAT),rbind(colorCA,colorAC),rbind(colorCT,colorAG))</span><br><span class="line">  </span><br><span class="line">  <span class="comment"># draw each bar: from left to right ...</span></span><br><span class="line">  <span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:nrow(data))&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># ... and back to front </span></span><br><span class="line">    <span class="keyword">for</span> (j <span class="keyword">in</span> ncol(data):<span class="number">1</span>)&#123;</span><br><span class="line">      </span><br><span class="line">      xy = which(data == data[i,j], arr.ind=<span class="literal">TRUE</span>)</span><br><span class="line">      </span><br><span class="line">      <span class="comment"># side facing y</span></span><br><span class="line">      x = <span class="built_in">rep</span>(xy[<span class="number">1</span>]-<span class="number">0.1</span>,<span class="number">4</span>)</span><br><span class="line">      y = <span class="built_in">c</span>(xy[<span class="number">2</span>]-<span class="number">0.9</span>,xy[<span class="number">2</span>]-<span class="number">0.1</span>,xy[<span class="number">2</span>]-<span class="number">0.1</span>,xy[<span class="number">2</span>]-<span class="number">0.9</span>)</span><br><span class="line">      z = <span class="built_in">c</span>(<span class="number">0</span>,<span class="number">0</span>,data[i,j],data[i,j])</span><br><span class="line">      polygon(trans3d(x, y, z, pmat), col=colorM[i,j], border=<span class="number">1</span>)</span><br><span class="line">      </span><br><span class="line">      <span class="comment">#  side facing x</span></span><br><span class="line">      x = <span class="built_in">c</span>(xy[<span class="number">1</span>]-<span class="number">0.9</span>,xy[<span class="number">1</span>]-<span class="number">0.1</span>,xy[<span class="number">1</span>]-<span class="number">0.1</span>,xy[<span class="number">1</span>]-<span class="number">0.9</span>)</span><br><span class="line">      y = <span class="built_in">rep</span>(xy[<span class="number">2</span>]-<span class="number">0.9</span>,<span class="number">4</span>)</span><br><span class="line">      z = <span class="built_in">c</span>(<span class="number">0</span>,<span class="number">0</span>,data[i,j],data[i,j])</span><br><span class="line">      polygon(trans3d(x, y, z, pmat), col=colorM[i,j], border=<span class="number">1</span>)</span><br><span class="line">      </span><br><span class="line">      <span class="comment"># top side</span></span><br><span class="line">      x = <span class="built_in">c</span>(xy[<span class="number">1</span>]-<span class="number">0.9</span>,xy[<span class="number">1</span>]-<span class="number">0.1</span>,xy[<span class="number">1</span>]-<span class="number">0.1</span>,xy[<span class="number">1</span>]-<span class="number">0.9</span>)</span><br><span class="line">      y = <span class="built_in">c</span>(xy[<span class="number">2</span>]-<span class="number">0.9</span>,xy[<span class="number">2</span>]-<span class="number">0.9</span>,xy[<span class="number">2</span>]-<span class="number">0.1</span>,xy[<span class="number">2</span>]-<span class="number">0.1</span>)</span><br><span class="line">      z = <span class="built_in">rep</span>(data[i,j],<span class="number">4</span>)</span><br><span class="line">      polygon(trans3d(x, y, z, pmat), col=colorM[i,j], border=<span class="number">1</span>)</span><br><span class="line">      </span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<div class="justified-gallery">![legoplot](/img/legoplot.png)</div>
+
+<p>从上图可以看出算法找到的突变谱分别为Tp*C-&gt;mut, Tp*A-&gt;T, C-&gt;A, misc, misc, *CpG-&gt;T。最后查看每种类型的癌症在这六种突变谱上的分布，即确认是否有的癌症只具有一种突变谱还是多种，可以通过绘制热图来查看。这里使用论文的可视化方法，通过绘制径向图查看。R绘图包plotrix中的radial.plot函数需要提供两个参数，即径向的长度和角度（以弧度为单位）。这里用每个样本的总突变率为长度。对于每个样本s，使$i_{sr}$表示在六个突变谱中第r-th个最大的权重，角度可以通过这个公式计算$\alpha_s=2\pi\sum _{r=0}^K{i_r(1/K)^r}$。第一个最大的权重决定样本在整个圆周的哪个扇区，第二大权重决定在上个扇区中的小扇区，以此推导。<br>R code:  </p>
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">spectrum.sample &lt;- basis(spectrum.fit)</span><br><span class="line">samlength=<span class="built_in">rep</span>(<span class="number">0</span>,<span class="number">2892</span>)</span><br><span class="line">radial=<span class="built_in">rep</span>(<span class="number">0</span>,<span class="number">2892</span>)</span><br><span class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">2892</span>)&#123;</span><br><span class="line">  ir=order(spectrum.sample[i,<span class="number">1</span>:<span class="number">6</span>],decreasing = <span class="built_in">T</span>)</span><br><span class="line">  radial[i]=<span class="number">2</span>*<span class="built_in">pi</span>*<span class="built_in">sum</span>(ir*(<span class="number">1</span>/<span class="number">6</span>)**(<span class="number">1</span>:<span class="number">6</span>))</span><br><span class="line">&#125;</span><br><span class="line">colorlist &lt;- <span class="built_in">list</span>(<span class="string">&#x27;AML&#x27;</span>=<span class="string">&#x27;#12A6DA&#x27;</span>,<span class="string">&#x27;Bladder&#x27;</span>=<span class="string">&#x27;#E5E515&#x27;</span>,<span class="string">&#x27;Breast&#x27;</span>=<span class="string">&#x27;#F37F81&#x27;</span>,<span class="string">&#x27;CLL&#x27;</span>=<span class="string">&#x27;#A94399&#x27;</span>,<span class="string">&#x27;Colorectal&#x27;</span>=<span class="string">&#x27;#0F9B5A&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;Carcinoid&#x27;</span>=<span class="string">&#x27;#6F2011&#x27;</span>,<span class="string">&#x27;Cervical&#x27;</span>=<span class="string">&#x27;#F58020&#x27;</span>,<span class="string">&#x27;DLBCL&#x27;</span>=<span class="string">&#x27;#2C2C81&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;Oesophageal adenocarcinoma&#x27;</span>=<span class="string">&#x27;#5DBB46&#x27;</span>,<span class="string">&#x27;Ewing sarcoma&#x27;</span>=<span class="string">&#x27;#664182&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;Glioblastoma multiforme&#x27;</span>=<span class="string">&#x27;#8B715D&#x27;</span>,<span class="string">&#x27;Head and neck&#x27;</span>=<span class="string">&#x27;#364EA1&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;Kidney clear cell&#x27;</span>=<span class="string">&#x27;#543C1C&#x27;</span>,<span class="string">&#x27;Kidney papillary cell&#x27;</span>=<span class="string">&#x27;#302636&#x27;</span>,<span class="string">&#x27;Low-grade glioma&#x27;</span>=<span class="string">&#x27;#8D5967&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;Lung adenocarcinoma&#x27;</span>=<span class="string">&#x27;#B12124&#x27;</span>,<span class="string">&#x27;Lung squamous cell carcinoma&#x27;</span>=<span class="string">&#x27;#ED1F24&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;Multiple myeloma&#x27;</span>=<span class="string">&#x27;#808233&#x27;</span>,<span class="string">&#x27;Medulloblastoma&#x27;</span>=<span class="string">&#x27;#16304A&#x27;</span>,<span class="string">&#x27;Melanoma&#x27;</span>=<span class="string">&#x27;#231F20&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;Neuroblastoma&#x27;</span>=<span class="string">&#x27;#39276B&#x27;</span>,<span class="string">&#x27;Ovarian&#x27;</span>=<span class="string">&#x27;#CC80B4&#x27;</span>,<span class="string">&#x27;Pancreas&#x27;</span>=<span class="string">&#x27;#543C1C&#x27;</span>,<span class="string">&#x27;Prostate&#x27;</span>=<span class="string">&#x27;#B3B48C&#x27;</span>,</span><br><span class="line"><span class="string">&#x27;Rhabdoid tumor&#x27;</span>=<span class="string">&#x27;#9999A6&#x27;</span>,<span class="string">&#x27;Stomach&#x27;</span>=<span class="string">&#x27;#69BD45&#x27;</span>,<span class="string">&#x27;Thyroid&#x27;</span>=<span class="string">&#x27;#A1A6D2&#x27;</span>)</span><br><span class="line">tumor_type=table(mutation[,<span class="number">1</span>])</span><br><span class="line">collevel=<span class="built_in">rep</span>(<span class="string">&#x27;&#x27;</span>,<span class="number">27</span>)</span><br><span class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:<span class="built_in">length</span>(colorlist))&#123;</span><br><span class="line">  collevel[i]=colorlist[[i]]</span><br><span class="line">&#125;</span><br><span class="line">colorpoint=<span class="built_in">rep</span>(<span class="string">&#x27;&#x27;</span>,<span class="number">2892</span>)</span><br><span class="line">loc=<span class="number">1</span></span><br><span class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:<span class="number">27</span>)&#123;</span><br><span class="line">  <span class="comment">#tumor=names(tumor_type[i])</span></span><br><span class="line">  colorpoint[loc:(loc+tumor_type[i]-<span class="number">1</span>)]=<span class="built_in">rep</span>(colorlist[[i]],tumor_type[i])</span><br><span class="line">  loc=loc+tumor_type[i]</span><br><span class="line">&#125;</span><br><span class="line">library(plotrix)</span><br><span class="line">radial.plot(<span class="built_in">log</span>(samlength,<span class="number">10</span>),radial,rp.type=<span class="string">&quot;s&quot;</span>,point.col=colorpoint,point.symbols=<span class="number">20</span>,</span><br><span class="line">            show.grid=<span class="built_in">T</span>,grid.col=<span class="string">&quot;white&quot;</span>,show.grid.labels=<span class="number">0</span>,</span><br><span class="line">            radial.lim=<span class="built_in">c</span>(log10(<span class="number">0.04</span>),log10(<span class="number">100</span>)),</span><br><span class="line">            label.pos=<span class="built_in">c</span>(<span class="built_in">pi</span>/<span class="number">2</span>,<span class="number">5</span>*<span class="built_in">pi</span>/<span class="number">6</span>,<span class="number">7</span>*<span class="built_in">pi</span>/<span class="number">6</span>,<span class="number">3</span>*<span class="built_in">pi</span>/<span class="number">2</span>,<span class="number">11</span>*<span class="built_in">pi</span>/<span class="number">6</span>,<span class="built_in">pi</span>/<span class="number">6</span>),</span><br><span class="line">            labels=<span class="built_in">c</span>(<span class="string">&#x27;Tp*C-&gt;mut&#x27;</span>,<span class="string">&#x27;Tp*A-&gt;T&#x27;</span>,<span class="string">&#x27;C-&gt;A&#x27;</span>,<span class="string">&#x27;misc&#x27;</span>,<span class="string">&#x27;misc&#x27;</span>,<span class="string">&#x27;*CpG-&gt;T&#x27;</span>))</span><br><span class="line">radial.plot(<span class="built_in">rep</span>(<span class="number">2</span>,<span class="number">6</span>),<span class="built_in">c</span>(<span class="number">0</span>,<span class="built_in">pi</span>/<span class="number">3</span>,<span class="built_in">pi</span>*<span class="number">2</span>/<span class="number">3</span>,<span class="built_in">pi</span>,<span class="built_in">pi</span>*<span class="number">4</span>/<span class="number">3</span>,<span class="built_in">pi</span>*<span class="number">5</span>/<span class="number">3</span>),rp.type=<span class="string">&#x27;r&#x27;</span>,</span><br><span class="line">            line.col = <span class="string">&#x27;grey&#x27;</span>,lwd=<span class="number">2</span>,add=<span class="built_in">T</span>,radial.lim=<span class="built_in">c</span>(log10(<span class="number">0.04</span>),log10(<span class="number">100</span>)))</span><br></pre></td></tr></table></figure>
+<div class="justified-gallery">![radial plot](/img/radial plot.png)</div>
+下面绘制图例  
+<figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plot(<span class="number">1</span>:<span class="number">30</span>,<span class="number">1</span>:<span class="number">30</span>,bty=<span class="string">&#x27;n&#x27;</span>,type=<span class="string">&#x27;n&#x27;</span>,xaxt=<span class="string">&#x27;n&#x27;</span>,yaxt=<span class="string">&#x27;n&#x27;</span>,xlab=<span class="string">&#x27;&#x27;</span>,ylab=<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">legend(<span class="number">1</span>,<span class="number">27</span>,<span class="built_in">names</span>(colorlist)[<span class="number">1</span>:<span class="number">14</span>],col=collevel[<span class="number">1</span>:<span class="number">14</span>],pch=<span class="number">19</span>,pt.cex=<span class="number">1.5</span>,bty=<span class="string">&#x27;n&#x27;</span>)</span><br><span class="line">legend(<span class="number">18</span>,<span class="number">27</span>,<span class="built_in">names</span>(colorlist)[<span class="number">15</span>:<span class="number">27</span>],col=collevel[<span class="number">15</span>:<span class="number">27</span>],pch=<span class="number">19</span>,pt.cex=<span class="number">1.5</span>,bty=<span class="string">&#x27;n&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<div class="justified-gallery">![legend](/img/legend.png)</div>
+从图中可以看到一些有意义的结果，例如AML主要分布在Tp*A->T的突变，而肺癌主要是C->A的突变。然后由于数据不完整，归一化做的比较，最终得到的结果也不是太好，并没有很好地解释癌症突变谱异质性。
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://mtpgm.com/2015/06/12/nmf/" data-id="cklq00l390009r8vidc8daztn" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2015/06/12/nmf/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2015/06/12/nmf/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2015/06/16/measure/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Newer</strong>
+            <div class="article-nav-title">
+                
+                    测度论（一）
+                
+            </div>
+        </a>
+    
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2015/06/12/nmf/" data-title="非负矩阵分解（NMF）" data-url="http://mtpgm.com/2015/06/12/nmf/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/03/01/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/01/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2021-03-01T03:01:34.844Z" itemprop="datePublished">2021-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/01/11/tensorflow/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/01/11/tensorflow/" class="title">Tensorflow基础</a></p>
+                            <p class="item-date"><time datetime="2017-01-11T12:51:03.000Z" itemprop="datePublished">2017-01-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/27/activityflow/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/img/activityflow.png)" alt="静态fMRI数据中的信息流动" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/27/activityflow/" class="title">静态fMRI数据中的信息流动</a></p>
+                            <p class="item-date"><time datetime="2016-12-27T01:36:25.000Z" itemprop="datePublished">2016-12-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/18/Cplus-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/18/Cplus-programming/" class="title">C++程序设计</a></p>
+                            <p class="item-date"><time datetime="2016-12-18T08:07:56.000Z" itemprop="datePublished">2016-12-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/17/C-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/17/C-programming/" class="title">C语言学习</a></p>
+                            <p class="item-date"><time datetime="2016-12-17T10:40:08.000Z" itemprop="datePublished">2016-12-17</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">March 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/" rel="tag">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/" rel="tag">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deep-learning/" rel="tag">deep learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" rel="tag">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" rel="tag">测度论</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/deep-learning/" style="font-size: 10px;">deep learning</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">机器学习</a> <a href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" style="font-size: 10px;">测度论</a>
+        </div>
+    </div>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2021 mtpgm<br>
+        </div>
+    </div>
+</footer>
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'true'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

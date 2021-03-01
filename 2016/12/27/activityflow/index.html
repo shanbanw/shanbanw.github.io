@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset="utf-8">
+    
+    <title>静态fMRI数据中的信息流动 | Game Programming</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="大脑信号传播是通过突触完成的，具体表现是受到激发的神经元发出一个个spike，激活突触中的信号通路，这个过程一般在微秒级的时间尺度上完成的。通过测量血液中氧气浓度(BOLD信号)来间接反应大脑信号强度的fMRI技术的缺点正是时间分辨率太低，导致不能采集出神经元放电前后的变化，也就不能让我们检测到信号传导的前后顺序。即我们只能从磁共振扫描仪采集的大脑信号看出来大脑每个位置的信号随时间的波动。最近看n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="静态fMRI数据中的信息流动">
+<meta property="og:url" content="http://mtpgm.com/2016/12/27/activityflow/index.html">
+<meta property="og:site_name" content="Game Programming">
+<meta property="og:description" content="大脑信号传播是通过突触完成的，具体表现是受到激发的神经元发出一个个spike，激活突触中的信号通路，这个过程一般在微秒级的时间尺度上完成的。通过测量血液中氧气浓度(BOLD信号)来间接反应大脑信号强度的fMRI技术的缺点正是时间分辨率太低，导致不能采集出神经元放电前后的变化，也就不能让我们检测到信号传导的前后顺序。即我们只能从磁共振扫描仪采集的大脑信号看出来大脑每个位置的信号随时间的波动。最近看n">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://mtpgm.com/img/activityflow.png">
+<meta property="article:published_time" content="2016-12-27T01:36:25.000Z">
+<meta property="article:modified_time" content="2017-01-05T13:38:38.551Z">
+<meta property="article:author" content="mtpgm">
+<meta property="article:tag" content="neuroscience">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://mtpgm.com/img/activityflow.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Game Programming" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/zhaoqiao.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?true";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+	<!-- syntaxhighlighter -->
+	<script type="text/javascript" src="/js/shCore.js"></script>
+	<link type="text/css" rel="stylesheet" href="/js/shCore.css"/>
+	<link type="text/css" rel="stylesheet" href="/js/shThemeDefault.css"/>
+	<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+	<script type="text/javascript" src="/js/shBrushPython.js"></script>
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Game Programming</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/qimu.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/qimu.png" />
+            <h2 id="name">bjshan</h2>
+            <h3 id="title">Algorithm Engineer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Beijing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/banjshan/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                10
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                7
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/banjshan/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-activityflow" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            
+	
+		<img src="/img/activityflow.png" class="article-banner" />
+	
+
+
+
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            静态fMRI数据中的信息流动
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2016/12/27/activityflow/">
+            <time datetime="2016-12-27T01:36:25.000Z" itemprop="datePublished">2016-12-27</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/neuroscience/" rel="tag">neuroscience</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>大脑信号传播是通过突触完成的，具体表现是受到激发的神经元发出一个个spike，激活突触中的信号通路，这个过程一般在微秒级的时间尺度上完成的。通过测量血液中氧气浓度(BOLD信号)来间接反应大脑信号强度的fMRI技术的缺点正是时间分辨率太低，导致不能采集出神经元放电前后的变化，也就不能让我们检测到信号传导的前后顺序。即我们只能从磁共振扫描仪采集的大脑信号看出来大脑每个位置的信号随时间的波动。最近看nature neuroscience的网站，发现了一篇论文——“<a target="_blank" rel="noopener" href="http://www.nature.com/neuro/journal/v19/n12/full/nn.4406.html">Activity flow over resting-state networks shapes cognitive task activations</a>“，单单是名字就很吸引人了，从相对静态的fMRI数据发现信息流动，是一个很神奇的设想。<span id="more"></span><br>论文作者把静息态网络作为大脑中相互交错的道路，大脑信号沿着这些路径在各个脑区之间流动，信号传递效率受到突触权重的影响。对于fmri，每个时间点每个脑区信号就是这种信号流动后的结果，也就是说每个脑区的信号是其他脑区信号传递到这个脑区的总和，可以用下面的模型表示，<br><img src="/img/activityflowmapping.png" alt="Activity flow mapping"><br>论文首先使用了模拟的数据来检验模型，虽然用了一个非常简单的模型来模拟数据，但对于初学者而言是一个非常有趣的模型。静息态下自发的大脑活动的起源目前并不清楚，但很多研究是通过结构连接来模拟静息态的功能连接的，所以这篇论文也是先建立了脑区间的结构连接，进而调整连接权重实现可塑性的突触连接。论文模拟了300个单元，代表了300个不同的脑区，然后设置网络密度为15%建立结构连接。脑区间的连接（cross-region connections）G取值范围设为0-5，脑区自连（self-connections，也成为reccurrent connections）Indep取值范围设为0-100。接着让结点间的相互连接形成3个结构单元。对于第一个结构单元，再通过调整突触权重形成2个功能单元。这样就生成了一个大脑的突触连接网络，也就是信号传播的道路。</p>
+<pre class="brush: py;">
+import numpy as np
+import matplotlib.pyplot as plt 
+from scipy.integrate import odeint  //用于计算积分
+numRegions = 300
+
+#Creating network model with random connectivity, 15% density with random synaptic strengths
+structConnVector=np.random.uniform(0,1,(numRegions,numRegions))&gt;.85
+#Add self-connections (important if adding autocorrelation later)
+np.fill_diagonal(structConnVector,10)
+#Create modular structural network (3 modules)
+numModules=3
+numRPerModule=int(round(numRegions/numModules))
+lastModuleNode=-1
+for moduleNum in range(0,numModules):
+    for thisNodeNum in range(lastModuleNode+1,lastModuleNode+numRPerModule+1):    
+        #Set this node to connect to 50 random other nodes in module
+        for i in range(1,numRPerModule//2):
+            randNodeInModule=int(np.random.uniform(lastModuleNode+1,lastModuleNode+numRPerModule-1,(1,1)))
+            structConnVector[thisNodeNum,randNodeInModule]=1
+    lastModuleNode=lastModuleNode+numRPerModule
+
+#Adding synaptic weights to existing structural connections (small random synapse strength variation)
+synapticWeightVector=structConnVector*(1+np.random.standard_normal((numRegions,numRegions))*.001)
+#Adding synaptic mini-communities (within community 1)
+synapticWeightVector[0:50,50:100]=synapticWeightVector[0:50,50:100]*0.5
+synapticWeightVector[50:100,0:50]=synapticWeightVector[50:100,0:50]*0.5
+synapticWeightVector[0:50,0:50]=synapticWeightVector[0:50,0:50]*1.5
+synapticWeightVector[50:100,50:100]=synapticWeightVector[50:100,50:100]*1.5
+
+#Implement global coupling parameter
+G=1
+synapticWeightVector=G*synapticWeightVector
+#Implement local independence parameter
+Indep=1
+
+plt.imshow(synapticWeightVector)
+plt.colorbar()
+plt.savefig('ActflowSim_StructMat.png',dpi=600,transparent=True, bbox_inches='tight')
+</pre>
+
+<p><img src="/img/ActflowSim_StructMat.png" alt="ActflowSim_StructMat"><br>论文接着使用经典的spiking rate model来生成自发的大脑活动和任务态的大脑活动。<br>$$\tau_i\frac{dx_i}{dt}=-x_i+f_i(\sum _{j=1}^{n}w_{ji}x_j + bias_i)\ \ \ i=[1..n]$$<br>静息态：在每个时间点，每个单元的活性都设为0，然后对所有单元同时进行刺激，让刺激引发的spike通过网络传播。自相关项设为AR(1)，系数设为0.1。<br>$$\varepsilon_t=0.1*\varepsilon_{t-1}+normal(0,1)$$<br>任务态：对每一个任务，选出5个连续的单元，在需要进行刺激的时间点处，把刺激强度加到静息态随机刺激强度上，然后让活动沿着网络传播开来。<font color="red">就像在一张餐巾纸上面滴一滴墨水，让其扩散开来</font>。</p>
+<pre class="brush: py;">
+def sigmoid(x):
+    return 1/(1+np.exp(-x))
+def equation(startActivity, t, spontActivity, synapticWeightVector, bias=0):
+    x=startActivity
+    dxdt = -x + sigmoid(np.dot(spontActivity, synapticWeightVector)+bias)
+    return dxdt
+def networkModel(G=1.0, Indep = 1.0, stimTimes=[], stimRegions=None, synapticWeightVector=synapticWeightVector, numTimePoints=numTimePoints):
+    bias = np.zeros(numRegions)
+    simulatedTimeseries=np.zeros((numTimePoints, numRegions))
+    #Each state modifies previous state (creating some autocorrelation; pink noise)
+    autocorrFactor=0.10
+
+    # Modulate synaptic weight matrix by coupling parameter, G
+    GlobalCouplingMat = synapticWeightVector*G
+    np.fill_diagonal(GlobalCouplingMat,0)
+    # Modulate self connection 'independence' parameter, Indep
+    IndepVarMat = np.identity(numRegions)*Indep
+    IndepVarMat = np.multiply(IndepVarMat,synapticWeightVector)
+    
+    # Now reconstruct synapticWeightMatrix
+    synapticWeightVector = GlobalCouplingMat + IndepVarMat
+    
+    # Begin computing simulation
+    for thisTimePoint in range(0,numTimePoints):
+        #one time step
+        t = np.linspace(0,1,2)
+        #initialize network
+        startActivity = np.zeros(numRegions)
+        # Generate spontaneous activity for initial state
+        spontActVector=np.random.normal(0,1,(numRegions,))
+        stimActVector=np.zeros(numRegions)
+
+        # Specify spontaneous input activity at this time point and task activity
+        if thisTimePoint in stimTimes:
+            #Include moment-to-moment variability in task stimulation
+            stimAct=np.ones(len(stimRegions))*np.random.normal(1,0.5,)
+            #stimAct=np.ones(len(stimRegions))*0.5   #excluding moment-to-moment variability in task stimulation
+            stimActVector[stimRegions]=stimActVector[stimRegions]+stimAct
+        # Add spontaneous activity vector with task stimulus
+        spontActVector=(autocorrFactor*spontActVector)+np.random.normal(0,1,(numRegions,))+stimActVector
+        
+        if thisTimePoint==0: # set initial condition
+            simulatedTimeseries[thisTimePoint,] = 0.0 # 0 for all regions
+        else:
+            simulatedTimeseries[i,]+=odeint(equation, startActivity, t, args=(spontActVector,synapticWeightVector,bias))[1,]
+
+    return simulatedTimeseries
+
+simulatedRestTimeseries = networkModel(G=G, Indep=Indep, stimTimes=[], stimRegions=None, numTimePoints=numTimePoints)
+</pre>
+<p>与hrf卷积，然后下采样到2s的分辨率</p>
+<pre class="brush: py;">
+def canonicalHRF(x, param={}):
+    if len(param)!=5:
+        param={'a1':6, 'a2':12, 'b1':0.9, 'b2':0.9, 'c':0.35}
+    d1 = param['a1']*param['b1']
+    d2 = param['a2']*param['b2']
+    return ((x/d1)**param['a1']*np.exp(-(x-d1)/param['b1']) - param['c']*(x/d2)**param['a2']*np.exp(-(x-d2)/param['b2']))
+simsample_rate=0.1
+simsample_times = np.arange(0, 30, simsample_rate)
+hrf = canonicalHRF(simsample_times)
+
+simulatedTimeseries_convolved=np.ones(np.shape(simulatedRestTimeseries))
+for regionNum in range(0,numRegions):
+    convolved = np.convolve(simulatedRestTimeseries[:,regionNum], hrf_at_simsample)
+    n_to_remove = len(hrf_at_simsample) - 1
+    convolved = convolved[:-n_to_remove]
+    simulatedTimeseries_convolved[:,regionNum]=convolved
+
+#Downsample fMRI time series
+TR=2
+dt_rec=0.1
+n_skip_BOLD = int(TR/dt_rec)
+BOLD_rec = simulatedTimeseries_convolved[::n_skip_BOLD]
+
+#Produce rest FC matrix based on produced spontaneous fMRI time series
+fcMat_rest=np.corrcoef(BOLD_rec[10:,],rowvar=0)
+#np.fill_diagonal(fcMat_rest,0)
+plt.imshow(fcMat_rest)
+plt.colorbar()
+plt.savefig('ActflowSim_RestfMRI_FCMat.png',dpi=600,transparent=True, bbox_inches='tight')
+</pre>
+
+<p><img src="/img/ActflowSim_RestfMRI_FCMat.png" alt="ActflowSim_RestfMRI_FCMat"></p>
+<p>剩下的部分非常明了，模拟任务态数据，然后运行activity flow model，接着迭代cross-region connections和self-connection的参数值，从中发现模型所需要的静息态网络的特性。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://mtpgm.com/2016/12/27/activityflow/" data-id="cklq00l310001r8vidj4sa1cf" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2016/12/27/activityflow/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2016/12/27/activityflow/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2017/01/11/tensorflow/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Newer</strong>
+            <div class="article-nav-title">
+                
+                    Tensorflow基础
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2016/12/18/Cplus-programming/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">C++程序设计</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2016/12/27/activityflow/" data-title="静态fMRI数据中的信息流动" data-url="http://mtpgm.com/2016/12/27/activityflow/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/03/01/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/01/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2021-03-01T03:01:34.844Z" itemprop="datePublished">2021-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/01/11/tensorflow/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/01/11/tensorflow/" class="title">Tensorflow基础</a></p>
+                            <p class="item-date"><time datetime="2017-01-11T12:51:03.000Z" itemprop="datePublished">2017-01-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/27/activityflow/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/img/activityflow.png)" alt="静态fMRI数据中的信息流动" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/27/activityflow/" class="title">静态fMRI数据中的信息流动</a></p>
+                            <p class="item-date"><time datetime="2016-12-27T01:36:25.000Z" itemprop="datePublished">2016-12-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/18/Cplus-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/18/Cplus-programming/" class="title">C++程序设计</a></p>
+                            <p class="item-date"><time datetime="2016-12-18T08:07:56.000Z" itemprop="datePublished">2016-12-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/17/C-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/17/C-programming/" class="title">C语言学习</a></p>
+                            <p class="item-date"><time datetime="2016-12-17T10:40:08.000Z" itemprop="datePublished">2016-12-17</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">March 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/" rel="tag">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/" rel="tag">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deep-learning/" rel="tag">deep learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" rel="tag">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" rel="tag">测度论</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/deep-learning/" style="font-size: 10px;">deep learning</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">机器学习</a> <a href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" style="font-size: 10px;">测度论</a>
+        </div>
+    </div>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2021 mtpgm<br>
+        </div>
+    </div>
+</footer>
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'true'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

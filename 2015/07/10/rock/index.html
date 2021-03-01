@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset="utf-8">
+    
+    <title>分类型变量的聚类算法 - ROCK | Game Programming</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="在数据挖掘中，聚类是发现数据分布模式的一种方式，把一组数据点按照某种合适的距离分成不同的簇，使得簇内有尽可能小的距离，而簇间有尽可能大的距离。本篇介绍一种适用于分类型变量的聚类算法 - ROCK，内容主要基于论文“ROCK: A Robust Clustering Algorithm for Categorical Attributes”。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分类型变量的聚类算法 - ROCK">
+<meta property="og:url" content="http://mtpgm.com/2015/07/10/rock/index.html">
+<meta property="og:site_name" content="Game Programming">
+<meta property="og:description" content="在数据挖掘中，聚类是发现数据分布模式的一种方式，把一组数据点按照某种合适的距离分成不同的簇，使得簇内有尽可能小的距离，而簇间有尽可能大的距离。本篇介绍一种适用于分类型变量的聚类算法 - ROCK，内容主要基于论文“ROCK: A Robust Clustering Algorithm for Categorical Attributes”。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2015-07-10T15:40:22.000Z">
+<meta property="article:modified_time" content="2016-12-30T18:17:07.137Z">
+<meta property="article:author" content="mtpgm">
+<meta property="article:tag" content="数据挖掘">
+<meta name="twitter:card" content="summary">
+    
+
+    
+        <link rel="alternate" href="/" title="Game Programming" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/zhaoqiao.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?true";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+	<!-- syntaxhighlighter -->
+	<script type="text/javascript" src="/js/shCore.js"></script>
+	<link type="text/css" rel="stylesheet" href="/js/shCore.css"/>
+	<link type="text/css" rel="stylesheet" href="/js/shThemeDefault.css"/>
+	<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+	<script type="text/javascript" src="/js/shBrushPython.js"></script>
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Game Programming</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/qimu.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/qimu.png" />
+            <h2 id="name">bjshan</h2>
+            <h3 id="title">Algorithm Engineer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Beijing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/banjshan/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                10
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                7
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/banjshan/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-rock" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            分类型变量的聚类算法 - ROCK
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2015/07/10/rock/">
+            <time datetime="2015-07-10T15:40:22.000Z" itemprop="datePublished">2015-07-10</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" rel="tag">数据挖掘</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>在数据挖掘中，聚类是发现数据分布模式的一种方式，把一组数据点按照某种合适的距离分成不同的簇，使得簇内有尽可能小的距离，而簇间有尽可能大的距离。本篇介绍一种适用于分类型变量的聚类算法 - ROCK，内容主要基于论文“ROCK: A Robust Clustering Algorithm for Categorical Attributes”。<span id="more"></span><br>ROCK是一种基于图的聚类算法，定义了数据点间的邻居（neighbors）和链接（links）。<br><strong>邻居（neighbors）</strong>：两个数据点间的相似度大于一定的阈值就可以称为邻居。即$sim(p_i,p_j)\geqslant\theta$。其中$\theta$是取值在0，1之间的一个小数，用于衡量两个点相似度。$sim$是相似度函数，可以是距离函数（如$L_1$, $L_2$），也可以是一些非度量型的（如一个领域的专家提供的相似度衡量方法）。对于分类型变量，我们选择Jaccard相似性函数，即<br>$$sim(T_1, T_2)=\frac{|T_1\cap T_2|}{|T_1\cup T_2|}$$<br>对于分类型变量，我们把每条记录当作一个交易，如果某个属性值缺失，仅仅让这条交易不包含这个属性。当然这只是一种处理缺失值的方法，针对不同的数据会有不同的处理方式。<br>Python code:  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np    </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">neighbors</span>(<span class="params">filename, theta</span>):</span>  </span><br><span class="line">    S=[]  </span><br><span class="line">    P=[]  </span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> <span class="built_in">open</span>(filename):  </span><br><span class="line">        lines=line.rstrip().split(<span class="string">&#x27;,&#x27;</span>)  </span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,<span class="built_in">len</span>(lines)):  </span><br><span class="line">            lines[i]+=<span class="built_in">str</span>(i)  </span><br><span class="line">        <span class="comment">#print lines  </span></span><br><span class="line">        <span class="keyword">if</span> <span class="string">&#x27;?11&#x27;</span> <span class="keyword">in</span> lines:  </span><br><span class="line">            lines.remove(<span class="string">&#x27;?11&#x27;</span>)  </span><br><span class="line">        S.append(<span class="built_in">set</span>(lines[<span class="number">1</span>:]))  </span><br><span class="line">        P.append(lines[<span class="number">0</span>])  </span><br><span class="line">    A=np.zeros((<span class="built_in">len</span>(S),<span class="built_in">len</span>(S)),dtype=<span class="string">&#x27;int16&#x27;</span>)  </span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(S)-<span class="number">1</span>):  </span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(i+<span class="number">1</span>,<span class="built_in">len</span>(S)):  </span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">float</span>(<span class="built_in">len</span>(S[i].intersection(S[j])))/<span class="built_in">len</span>(S[i].union(S[j])) &gt;= theta:  </span><br><span class="line">                A[i,j]=<span class="number">1</span>  </span><br><span class="line">                A[j,i]=<span class="number">1</span>  </span><br><span class="line">    <span class="keyword">return</span> A,P  </span><br></pre></td></tr></table></figure>
+<p>数据是UCI数据库里面用作benchmark的Mushroom数据集(<a target="_blank" rel="noopener" href="https://archive.ics.uci.edu/ml/datasets/Mushroom">https://archive.ics.uci.edu/ml/datasets/Mushroom</a>)，其中只有一个一个属性值有缺失。使用上面的函数建立neighbors矩阵B和类别向量P。<br>Python code:  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">B,P=neighbors(<span class="string">&#x27;agaricus-lepiota.data.txt&#x27;</span>,<span class="number">0.8</span>)  </span><br></pre></td></tr></table></figure>
+<p><strong>连接（links）</strong>：两个点之间的连接数$link(p_i, p_j)$定义为这两个点共同邻居的个数，因此，这种基于连接的方法是一种考虑全局性的聚类算法。通过下面程序可以得到Mushroom数据点之间的连接矩阵A。<br>Python code:  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">compute_links</span>(<span class="params">A</span>):</span></span><br><span class="line">    link=np.zeros_like(A)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(A.shape[<span class="number">0</span>]):</span><br><span class="line">        N=np.where(A[i,]&gt;<span class="number">0</span>)[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(N)-<span class="number">1</span>):</span><br><span class="line">            <span class="keyword">for</span> z <span class="keyword">in</span> <span class="built_in">range</span>(j+<span class="number">1</span>,<span class="built_in">len</span>(N)):</span><br><span class="line">                link[N[j],N[z]]+=<span class="number">1</span></span><br><span class="line">                link[N[z],N[j]]+=<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> link</span><br><span class="line">A=compute_links(B)</span><br></pre></td></tr></table></figure>
+<p><strong>准则函数（Criterion Function）</strong>：寻找最好的簇等价于最大化准则函数。我们的目的是让簇内有高的连接度，同时最小化不同簇之间的连接度。因此可以采用如下函数：<br>$$E_l = \sum_{i=1}^k n_i \ast \sum_{p_q,p_r \in C_i} \frac{link(p_q, p_r)}{n_i^{1+2 f ( \theta )}}$$</p>
+<p>其中$C_i$代表第i个簇，左边的分母为$C_i$中期望的连接数。本文使用的$f(\theta)$为$\frac{1-\theta}{1+\theta}$。  </p>
+<p><strong>适合度函数（Goodness Measure）</strong>：根据准则函数，我们可以得到两个簇之间的适合度函数，即评价两个簇是否相近，以便合并在一起。如下：<br>$$link[C_i, C_j] = \sum_{p_q \in C_i, p_r \in C_j} link(p_q, p_r)$$  </p>
+<p>即两个簇之间的连接数为其中结点间连接数的总和。  </p>
+<p>$$g(C_i,C_j)=\frac{link[C_i,C_j]}{(n_i + n_j)^{1+2 f(\theta)} - n_i^{1+2f(\theta)}-n_j^{1+2f(\theta)}}$$<br>$C_i$, $C_j$两个簇合并在一起后期望的连接数为$(n_i +n_j)^{1+2f(\theta)}$，每个簇内的期望数分别为$n_i^{1+2f(\theta)}$和$n_j^{1+2f(\theta)}$，因此簇间的期望连接数为他们相减。除以期望数可以让簇以使准则函数最大的方向进行。<br>Python code:  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">goodness</span>(<span class="params">value, c1, c2, theta</span>):</span></span><br><span class="line">    <span class="keyword">return</span> value/((c1+c2)**(<span class="number">1</span>+<span class="number">2</span>*(<span class="number">1</span>-theta)/(<span class="number">1</span>+theta))-c1**(<span class="number">1</span>+<span class="number">2</span>*(<span class="number">1</span>-theta)/(<span class="number">1</span>+theta))-c2**(<span class="number">1</span>+<span class="number">2</span>*(<span class="number">1</span>-theta)/(<span class="number">1</span>+theta)))  </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete</span>(<span class="params">Q,value</span>):</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> Q:</span><br><span class="line">        <span class="keyword">if</span> i[<span class="number">1</span>]==value:</span><br><span class="line">            Q.remove(i)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">update</span>(<span class="params">Q,value,link</span>):</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(Q)):</span><br><span class="line">        <span class="keyword">if</span> Q[i][<span class="number">1</span>]==value:</span><br><span class="line">            Q.remove(Q[i])</span><br><span class="line">            Q.insert(i,(link,value))</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_heap</span>(<span class="params">A,theta</span>):</span></span><br><span class="line">    q=&#123;&#125;</span><br><span class="line">    Q=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(A.shape[<span class="number">0</span>]):</span><br><span class="line">        q[<span class="built_in">tuple</span>([i])]=[]</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(A.shape[<span class="number">1</span>]):</span><br><span class="line">            <span class="keyword">if</span> j==i <span class="keyword">or</span> A[i,j]==<span class="number">0</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            <span class="comment">#if tuple([i]) not in q:</span></span><br><span class="line">             <span class="comment">#   q[tuple([i])]=[]</span></span><br><span class="line">            heapq.heappush(q[<span class="built_in">tuple</span>([i])], (goodness(A[i,j],<span class="number">1</span>,<span class="number">1</span>,theta)*(-<span class="number">1</span>),[j]))</span><br><span class="line">            <span class="comment">#print q[tuple([i])]</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(q[<span class="built_in">tuple</span>([i])])&gt;<span class="number">0</span>:</span><br><span class="line">            heapq.heappush(Q, (q[<span class="built_in">tuple</span>([i])][<span class="number">0</span>][<span class="number">0</span>],[i]))</span><br><span class="line">    <span class="keyword">return</span> q,Q    </span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> heapq</span><br><span class="line"><span class="keyword">import</span> copy    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cluster</span>(<span class="params">A, k, theta</span>):</span></span><br><span class="line">    q=&#123;&#125;</span><br><span class="line">    Q=[]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(A.shape[<span class="number">0</span>]):</span><br><span class="line">        q[<span class="built_in">tuple</span>([i])]=[]</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(A.shape[<span class="number">1</span>]):</span><br><span class="line">            <span class="keyword">if</span> j==i <span class="keyword">or</span> A[i,j]==<span class="number">0</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            heapq.heappush(q[<span class="built_in">tuple</span>([i])], (goodness(A[i,j],<span class="number">1</span>,<span class="number">1</span>,theta)*(-<span class="number">1</span>),[j]))</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(q[<span class="built_in">tuple</span>([i])])&gt;<span class="number">0</span>:</span><br><span class="line">            heapq.heappush(Q, (q[<span class="built_in">tuple</span>([i])][<span class="number">0</span>][<span class="number">0</span>],[i]))</span><br><span class="line">    <span class="built_in">print</span> <span class="built_in">len</span>(Q)</span><br><span class="line">    <span class="keyword">while</span> <span class="built_in">len</span>(Q)&gt;k:</span><br><span class="line">        <span class="built_in">print</span> <span class="string">&quot;lenQ: &quot;</span>,<span class="built_in">len</span>(Q)</span><br><span class="line">        <span class="built_in">print</span> <span class="string">&quot;lenq: &quot;</span>,<span class="built_in">len</span>(q)</span><br><span class="line">        <span class="keyword">if</span> Q[<span class="number">0</span>][<span class="number">0</span>] == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> Q</span><br><span class="line">        u=heapq.heappop(Q)</span><br><span class="line">        <span class="built_in">print</span> <span class="string">&quot;lenQafterpop: &quot;</span>,<span class="built_in">len</span>(Q)</span><br><span class="line">        w=copy.deepcopy(u[<span class="number">1</span>])</span><br><span class="line">        <span class="built_in">print</span> <span class="string">&quot;MAXlink: &quot;</span>,u[<span class="number">0</span>]</span><br><span class="line">        u=u[<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">tuple</span>(u) <span class="keyword">not</span> <span class="keyword">in</span> q:</span><br><span class="line">            <span class="built_in">print</span> <span class="string">&quot;u: &quot;</span>,u</span><br><span class="line">        v=q[<span class="built_in">tuple</span>(u)][<span class="number">0</span>][<span class="number">1</span>]</span><br><span class="line">        <span class="built_in">print</span> <span class="string">&quot;v: &quot;</span>,v</span><br><span class="line">        delete(Q,v)</span><br><span class="line">        <span class="built_in">print</span> <span class="string">&quot;lenQafterdeletev: &quot;</span>,<span class="built_in">len</span>(Q)</span><br><span class="line">        <span class="built_in">print</span> <span class="string">&quot;lenQafterremoveUV: &quot;</span>,<span class="built_in">len</span>(Q)</span><br><span class="line">        w.extend(v)</span><br><span class="line">        q[<span class="built_in">tuple</span>(w)]=[]</span><br><span class="line">        U=[<span class="built_in">tuple</span>(x[<span class="number">1</span>]) <span class="keyword">for</span> x <span class="keyword">in</span> q[<span class="built_in">tuple</span>(u)]]</span><br><span class="line">        V=[<span class="built_in">tuple</span>(x[<span class="number">1</span>]) <span class="keyword">for</span> x <span class="keyword">in</span> q[<span class="built_in">tuple</span>(v)]]</span><br><span class="line">        U.extend(V)</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(U)==<span class="number">2</span>:</span><br><span class="line">            heapq.heappush(Q,(<span class="number">0</span>,w))</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">set</span>(U):</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">set</span>(x).issubset(<span class="built_in">set</span>(<span class="built_in">tuple</span>(w))) :</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            link=<span class="number">0</span></span><br><span class="line">            <span class="keyword">for</span> y <span class="keyword">in</span> w:</span><br><span class="line">                <span class="keyword">for</span> z <span class="keyword">in</span> x:</span><br><span class="line">                    link+=A[y,z]</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">tuple</span>(x) <span class="keyword">not</span> <span class="keyword">in</span> q:</span><br><span class="line">                <span class="built_in">print</span> <span class="string">&quot;x: &quot;</span>,x</span><br><span class="line">            delete(q[<span class="built_in">tuple</span>(x)],u)</span><br><span class="line">            delete(q[<span class="built_in">tuple</span>(x)],v)</span><br><span class="line">            g=goodness(link,<span class="built_in">len</span>(x),<span class="built_in">len</span>(w),theta)*(-<span class="number">1</span>)</span><br><span class="line">            q[<span class="built_in">tuple</span>(x)].append((g,w))</span><br><span class="line">            q[<span class="built_in">tuple</span>(w)].append((g,<span class="built_in">list</span>(x)))</span><br><span class="line">            heapq.heapify(q[<span class="built_in">tuple</span>(x)])</span><br><span class="line">            heapq.heapify(q[<span class="built_in">tuple</span>(w)])</span><br><span class="line">            update(Q,<span class="built_in">list</span>(x),q[<span class="built_in">tuple</span>(x)][<span class="number">0</span>][<span class="number">0</span>])</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(q[<span class="built_in">tuple</span>(w)])&gt;<span class="number">0</span>:</span><br><span class="line">            Q.append((q[<span class="built_in">tuple</span>(w)][<span class="number">0</span>][<span class="number">0</span>],w))</span><br><span class="line">        heapq.heapify(Q)</span><br><span class="line">        <span class="keyword">del</span> q[<span class="built_in">tuple</span>(u)]</span><br><span class="line">        <span class="keyword">del</span> q[<span class="built_in">tuple</span>(v)]</span><br><span class="line">    <span class="keyword">return</span> Q</span><br></pre></td></tr></table></figure>
+<p>函数需要提供类的个数，当类达到要求时会结束聚类过程。当任何两个类之间没有共同连接时也会停止聚类。如下得到Mushroom数据聚类的结果。  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Q=cluster(A,<span class="number">20</span>,<span class="number">0.8</span>)</span><br></pre></td></tr></table></figure>
+<p>最后查看所得到类的性质。  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">printQ</span>(<span class="params">Q,P</span>):</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(Q)):</span><br><span class="line">        stat=&#123;<span class="string">&#x27;p&#x27;</span>:<span class="number">0</span>,<span class="string">&#x27;e&#x27;</span>:<span class="number">0</span>&#125;</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> Q[i][<span class="number">1</span>]:</span><br><span class="line">            stat[P[j]]+=<span class="number">1</span></span><br><span class="line">        <span class="built_in">print</span> <span class="built_in">str</span>(i+<span class="number">1</span>)+<span class="string">&#x27;: p-&#x27;</span>+<span class="built_in">str</span>(stat[<span class="string">&#x27;p&#x27;</span>])+<span class="string">&#x27; e-&#x27;</span>+<span class="built_in">str</span>(stat[<span class="string">&#x27;e&#x27;</span>])</span><br><span class="line">printQ(Q,P)</span><br></pre></td></tr></table></figure>
+<p>输出如下：<br>1: p-256 e-0<br>2: p-0 e-704<br>3: p-0 e-1728<br>4: p-0 e-96<br>5: p-0 e-96<br>6: p-192 e-0<br>7: p-288 e-0<br>8: p-1728 e-0<br>9: p-0 e-192<br>10: p-0 e-768<br>11: p-32 e-0<br>12: p-36 e-0<br>13: p-8 e-0<br>14: p-0 e-192<br>15: p-0 e-48<br>16: p-0 e-288<br>17: p-0 e-48<br>18: p-72 e-32<br>19: p-0 e-16<br>20: p-8 e-0<br>21: p-1296 e-0<br>可以看到，虽然指定了类的个数20，但算法找到了21个类，它们之间的连接数均为零，使得聚类过程无法继续进行下去。另外，可以看到，除了第18个簇，其他簇全部是有毒的(p)，或者全部是可食用的(e)，说明这种聚类算法在Mushroom数据集上得到了很好的结果。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://mtpgm.com/2015/07/10/rock/" data-id="cklq00l3b000br8vi2r1vhfc8" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2015/07/10/rock/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2015/07/10/rock/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2015/08/14/lle/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Newer</strong>
+            <div class="article-nav-title">
+                
+                    非线性维度下降之局部线性插值
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2015/06/16/measure/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">测度论（一）</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2015/07/10/rock/" data-title="分类型变量的聚类算法 - ROCK" data-url="http://mtpgm.com/2015/07/10/rock/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/03/01/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/01/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2021-03-01T03:01:34.844Z" itemprop="datePublished">2021-03-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/01/11/tensorflow/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/01/11/tensorflow/" class="title">Tensorflow基础</a></p>
+                            <p class="item-date"><time datetime="2017-01-11T12:51:03.000Z" itemprop="datePublished">2017-01-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/27/activityflow/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/img/activityflow.png)" alt="静态fMRI数据中的信息流动" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/27/activityflow/" class="title">静态fMRI数据中的信息流动</a></p>
+                            <p class="item-date"><time datetime="2016-12-27T01:36:25.000Z" itemprop="datePublished">2016-12-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/18/Cplus-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/18/Cplus-programming/" class="title">C++程序设计</a></p>
+                            <p class="item-date"><time datetime="2016-12-18T08:07:56.000Z" itemprop="datePublished">2016-12-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/17/C-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/17/C-programming/" class="title">C语言学习</a></p>
+                            <p class="item-date"><time datetime="2016-12-17T10:40:08.000Z" itemprop="datePublished">2016-12-17</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">March 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/" rel="tag">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/" rel="tag">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deep-learning/" rel="tag">deep learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" rel="tag">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" rel="tag">测度论</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/deep-learning/" style="font-size: 10px;">deep learning</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">机器学习</a> <a href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" style="font-size: 10px;">测度论</a>
+        </div>
+    </div>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2021 mtpgm<br>
+        </div>
+    </div>
+</footer>
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'true'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
