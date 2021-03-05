@@ -5,13 +5,13 @@ tags: Creational Design Pattern
 ---
 从一个对象复制出一个拷贝
 ``` CSharp
-using EngineEngine;
+using UnityEngine;
 
 public class Spawner
 {
-    public T Spawn<T>(T prototype)
+    public static T Spawn<T>(T prototype) where T : Object
     {
-        return Instantiate(prototype);
+        return Object.Instantiate(prototype);
     }
 }
 ```
