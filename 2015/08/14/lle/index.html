@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset="utf-8">
+    
+    <title>非线性维度下降之局部线性插值 | Game Programming</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="非线性维度下降的目的是发现隐藏在高维数据中的低维结构，例如手写字体的方向，弯曲程度，写字风格（比如2右下角带不带环）。维度下降的基本假设是数据点位于高维空间中的一个很薄的流体上或者其附近，这个流体的维度就是数据的内在维度，远低于空间的维度，维度下降算法就是用来重构这个内在维度。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="非线性维度下降之局部线性插值">
+<meta property="og:url" content="http://mtpgm.com/2015/08/14/lle/index.html">
+<meta property="og:site_name" content="Game Programming">
+<meta property="og:description" content="非线性维度下降的目的是发现隐藏在高维数据中的低维结构，例如手写字体的方向，弯曲程度，写字风格（比如2右下角带不带环）。维度下降的基本假设是数据点位于高维空间中的一个很薄的流体上或者其附近，这个流体的维度就是数据的内在维度，远低于空间的维度，维度下降算法就是用来重构这个内在维度。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://mtpgm.com/img/lle.png">
+<meta property="og:image" content="http://mtpgm.com/img/mlle.png">
+<meta property="article:published_time" content="2015-08-14T01:18:41.000Z">
+<meta property="article:modified_time" content="2021-03-05T15:21:45.952Z">
+<meta property="article:author" content="mtpgm">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://mtpgm.com/img/lle.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Game Programming" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/zhaoqiao.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?true";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+	<!-- syntaxhighlighter -->
+	<script type="text/javascript" src="/js/shCore.js"></script>
+	<link type="text/css" rel="stylesheet" href="/js/shCore.css"/>
+	<link type="text/css" rel="stylesheet" href="/js/shThemeDefault.css"/>
+	<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+	<script type="text/javascript" src="/js/shBrushPython.js"></script>
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Game Programming</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/qimu.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/qimu.png" />
+            <h2 id="name">shanbanw</h2>
+            <h3 id="title">Algorithm Engineer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Beijing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/shanbanw/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                10
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                8
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/shanbanw/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-lle" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            非线性维度下降之局部线性插值
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2015/08/14/lle/">
+            <time datetime="2015-08-14T01:18:41.000Z" itemprop="datePublished">2015-08-14</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>非线性维度下降的目的是发现隐藏在高维数据中的低维结构，例如手写字体的方向，弯曲程度，写字风格（比如2右下角带不带环）。维度下降的基本假设是数据点位于高维空间中的一个很薄的流体上或者其附近，这个流体的维度就是数据的内在维度，远低于空间的维度，维度下降算法就是用来重构这个内在维度。<span id="more"></span>线性维度下降，例如PCA, ICA, 是假设这个流体是一个低维平面，即一组正交的基向量生成的一个空间，数据点可以由这些基向量的不同线性组合来表示，非线性维度下降则是应对非这种平面的流体的一种降维方法，一般称为流体学习（mandifold learning）。本文介绍一种局部线性插值（locally linear embedding）的流体学习方法及它的一个改进。这个方法有很好的几何直观性，数据点在高维空间如果能由它的邻近数据点的加权得到，那么在低维空间同样可以用相同的权重由它的邻近数据点加权得到。算法的推导和实现如下：  </p>
+<ol>
+<li>计算k-近邻<br>找到每个数据点K-个最近的邻近数据点，K的选择影响算法最后得到的低维结构。python code:  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> numpy.matlib <span class="keyword">import</span> repmat</span><br><span class="line"><span class="comment">#X = data as D x N matrix (D = dimensionality, N = #points)</span></span><br><span class="line">D,N=X.shape</span><br><span class="line">X2=np.<span class="built_in">sum</span>(X**<span class="number">2</span>,<span class="number">0</span>).reshape(<span class="number">1</span>,N)</span><br><span class="line">distance=repmat(X2,N,<span class="number">1</span>)+repmat(X2.T,<span class="number">1</span>,N)-<span class="number">2</span>*np.dot(X.T,X)</span><br><span class="line">index=np.argsort(distance,<span class="number">0</span>)</span><br><span class="line">neighborhood=index[<span class="number">1</span>:<span class="number">1</span>+K,:]</span><br></pre></td></tr></table></figure></li>
+<li>计算权重矩阵<br>对每个数据点$\mathbf{x}$，K个最近邻用$\mathbf{x}_\boldsymbol{j}$表示，最小化它的重构误差，<br>$$\varepsilon(\mathbf{w})=||\mathbf{x}-\sum_j w _j \mathbf{x}_\boldsymbol{j} ||^2     \ \ \ \      s.t.   \ \   \sum _j w_j = 1$$<br>$$\varepsilon(\mathbf{w})=||\sum _j w _j (\mathbf{x}-\mathbf{x}_\boldsymbol{j})||^2 = \sum _ {jk} w _j w _k (\mathbf{x}-\mathbf{x}_\boldsymbol{j})^T (\mathbf{x}-\mathbf{x}_\boldsymbol{k})$$<br>令$\mathbf{G}=[\centerdot\centerdot\centerdot, (\mathbf{x}-\mathbf{x}_\boldsymbol{j}),\centerdot\centerdot\centerdot]$，可定义局部协方差矩阵$\mathbf{C}$（local covariance matrix）为<br>$$\mathbf{C} = \mathbf{G}^T \mathbf{G} $$<br>此时有<br>$$\varepsilon(\mathbf{w})=\mathbf{w}^\boldsymbol{T} \mathbf{C} \mathbf{w} \ \ \  s.t.\ \  ||\mathbf{w}||=1$$<br>可以利用拉格朗日乘数法求最优解，构造函数<br>$$f(\mathbf{w},\lambda)=\mathbf{w}^\boldsymbol{T} \mathbf{C} \mathbf{w} - 2*\lambda (\boldsymbol{1}^T \mathbf{w}-1)$$<br>求偏导并令之等于零可得，<br>$$\mathbf{C} \mathbf{w}=\lambda\boldsymbol{1}$$<br>根据$ \mathbf{w}$的模为1可解出$\lambda=\frac{1}{\boldsymbol{1}^T \mathbf{C}^{-1} \boldsymbol{1}}$，即矩阵$\mathbf{C}$的逆所有元素相加的和。进而可以求出$\mathbf{w}$<br>$$\mathbf{w}=\frac{\mathbf{C}^{-1}\boldsymbol{1}}{\boldsymbol{1}^T \mathbf{C}^{-1} \boldsymbol{1}}$$<br>可以看出分母是分子的和，所以等同于求$\mathbf{C}\mathbf{w}=\boldsymbol{1}$的解，然后归一化使$\mathbf{w}$的模为1。当K大于数据点的维度时，每个数据点可以由不同的邻近数据点的不同组和线性表示出来，即权重矩阵不唯一，矩阵$\mathbf{C}$为奇异矩阵，无法求逆，此时应加入正则项。python code:  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> K&gt;D:</span><br><span class="line">    tol=<span class="number">1e-3</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    tol=<span class="number">0</span></span><br><span class="line">W=np.zeros((K,N))</span><br><span class="line"><span class="keyword">for</span> ii <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">    z=X[:,neighborhood[:,ii]]-repmat(X[:,ii].reshape(D,<span class="number">1</span>),<span class="number">1</span>,K)</span><br><span class="line">    C=np.dot(z.T,z)</span><br><span class="line">    C=C+np.eye(K)*tol*np.trace(C)</span><br><span class="line">    W[:,ii]=np.dot(np.linalg.inv(C),np.ones((K,<span class="number">1</span>))).reshape((<span class="number">12</span>,))</span><br><span class="line">    W[:,ii]=W[:,ii]/<span class="built_in">sum</span>(W[:,ii])</span><br></pre></td></tr></table></figure></li>
+<li>求低维空间的坐标<br>最小化插值误差函数<br>\[\begin{split}\Phi(\mathbf{Y})&amp;=\sum _i ||\mathbf{y} _i - \sum _j w _j \mathbf{y} _j||^2=tr((\mathbf{Y}-\mathbf{WY})^T(\mathbf{Y}-\mathbf{WY})) \\ &amp;=tr(\mathbf{Y}^T(\mathbf{I}-\mathbf{W})^T(\mathbf{I}-\mathbf{W})\mathbf{Y}) =\sum _i ^d \mathbf{Y}_i ^T \mathbf{M}\mathbf{Y} _i \end{split}\]<br>令$\mathbf{M}=(\mathbf{I}-\mathbf{W})^T(\mathbf{I}-\mathbf{W})$，并且约束$\mathbf{Y}$有零均值，单位协方差矩阵，那么最小化此二次型当且仅当$\mathbf{Y}$为$\mathbf{M}$的最小d+1个特征值对应的特征向量（Rayleigh-Ritz theorem），舍去第一个零特征值对应的特征向量。python code:  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scipy.sparse <span class="keyword">as</span> sp</span><br><span class="line"><span class="keyword">from</span> scipy.sparse.linalg.eigen.arpack <span class="keyword">import</span> eigsh</span><br><span class="line">M=sp.csr_matrix(np.eye(N))</span><br><span class="line"><span class="keyword">for</span> ii <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">    w=W[:,ii]</span><br><span class="line">    jj=neighborhood[:,ii]</span><br><span class="line">    M[ii,jj]=M[ii,jj]-w</span><br><span class="line">    M[jj,ii]=M[jj,ii]-w.reshape(K,<span class="number">1</span>)</span><br><span class="line">    M[np.ix_(jj,jj)]=M[np.ix_(jj,jj)]+np.dot(w.reshape(K,<span class="number">1</span>),w.reshape(<span class="number">1</span>,K))</span><br><span class="line"><span class="built_in">print</span> <span class="string">&#x27;begin solving eigenvectors&#x27;</span></span><br><span class="line">eigenvals, Y=eigsh(M,d+<span class="number">1</span>,sigma=<span class="number">0.0</span>,tol=<span class="number">1e-6</span>)</span><br><span class="line">Y_r=Y[:,<span class="number">1</span>:].T*(np.sqrt(N))</span><br></pre></td></tr></table></figure>
+以上各部分可整合成一个函数lle(X,K,d)，X是输入数据，K是近邻数，d是流体的维度。<br>下面对瑞士卷(swissroll)和S-曲线(s-curve)使用lle算法。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line">N=<span class="number">2000</span></span><br><span class="line">K=<span class="number">12</span></span><br><span class="line">d=<span class="number">2</span></span><br><span class="line"></span><br><span class="line">tt0 = (<span class="number">3</span>*np.pi/<span class="number">2</span>)*(<span class="number">1</span>+<span class="number">2</span>*np.arange(<span class="number">0</span>,<span class="number">1.01</span>,<span class="number">0.02</span>))</span><br><span class="line">hh = np.arange(<span class="number">0</span>,<span class="number">1.01</span>,<span class="number">0.125</span>)*<span class="number">30</span></span><br><span class="line">xx = np.dot((tt0*np.cos(tt0)).reshape(<span class="built_in">len</span>(tt0),<span class="number">1</span>),np.ones((<span class="number">1</span>,<span class="built_in">len</span>(hh))))</span><br><span class="line">yy = np.dot(np.ones((<span class="built_in">len</span>(tt0),<span class="number">1</span>)),hh.reshape(<span class="number">1</span>,<span class="built_in">len</span>(hh)))</span><br><span class="line">zz = np.dot((tt0*np.sin(tt0)).reshape(<span class="built_in">len</span>(tt0),<span class="number">1</span>),np.ones((<span class="number">1</span>,<span class="built_in">len</span>(hh))))</span><br><span class="line">cc = np.dot(tt0.reshape(<span class="built_in">len</span>(tt0),<span class="number">1</span>),np.ones((<span class="number">1</span>,<span class="built_in">len</span>(hh))))</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> mpl_toolkits.mplot3d <span class="keyword">import</span> Axes3D</span><br><span class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> cm</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> matplotlib.colors <span class="keyword">import</span> Normalize</span><br><span class="line"></span><br><span class="line">color_map = cm.jet</span><br><span class="line">scalarMap = cm.ScalarMappable(norm=Normalize(vmin=cc.<span class="built_in">min</span>(), vmax=cc.<span class="built_in">max</span>()), cmap=color_map)</span><br><span class="line">C_colored = scalarMap.to_rgba(cc)</span><br><span class="line"></span><br><span class="line">fig = plt.figure()</span><br><span class="line">ax = fig.add_subplot(<span class="number">2</span>,<span class="number">3</span>,<span class="number">1</span>,projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">ax._axis3don = <span class="literal">False</span></span><br><span class="line">surf = ax.plot_surface(xx, yy, zz, rstride=<span class="number">1</span>, cstride=<span class="number">1</span>,facecolors=C_colored,zorder=<span class="number">1</span>)</span><br><span class="line">surf.set_edgecolor(<span class="string">&#x27;k&#x27;</span>)</span><br><span class="line">ax.view_init(<span class="number">20</span>,-<span class="number">72</span>)</span><br><span class="line">ax.set_xlim(-<span class="number">15</span>,<span class="number">20</span>)</span><br><span class="line">ax.set_ylim(<span class="number">0</span>,<span class="number">32</span>)</span><br><span class="line">ax.set_zlim(-<span class="number">15</span>,<span class="number">15</span>)</span><br><span class="line">ax.plot([-<span class="number">15</span>,-<span class="number">15</span>],[<span class="number">0</span>,<span class="number">32</span>],[-<span class="number">15</span>,-<span class="number">15</span>],<span class="string">&#x27;k-&#x27;</span>,lw=<span class="number">2</span>,clip_on=<span class="literal">True</span>,clip_box=surf,zorder=-<span class="number">1</span>)</span><br><span class="line">ax.plot([-<span class="number">15</span>,<span class="number">20</span>],[<span class="number">0</span>,<span class="number">0</span>],[-<span class="number">15</span>,-<span class="number">15</span>],<span class="string">&#x27;k-&#x27;</span>,linewidth=<span class="number">2</span>)</span><br><span class="line">ax.plot([-<span class="number">15</span>,-<span class="number">15</span>],[<span class="number">0</span>,<span class="number">0</span>],[-<span class="number">15</span>,<span class="number">15</span>],<span class="string">&#x27;k-&#x27;</span>,linewidth=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">tt = (<span class="number">3</span>*np.pi/<span class="number">2</span>)*(<span class="number">1</span>+<span class="number">2</span>*np.random.rand(<span class="number">1</span>,N))</span><br><span class="line">height = <span class="number">21</span>*np.random.rand(<span class="number">1</span>,N)</span><br><span class="line">X = np.row_stack((tt*np.cos(tt),height,tt*np.sin(tt)))</span><br><span class="line"></span><br><span class="line">ax=fig.add_subplot(<span class="number">2</span>,<span class="number">3</span>,<span class="number">2</span>,projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">sca=ax.scatter(X[<span class="number">0</span>,:],X[<span class="number">1</span>,:],X[<span class="number">2</span>,:],s=<span class="number">12</span>,c=tt,marker=<span class="string">&#x27;+&#x27;</span>,cmap=cm.jet,</span><br><span class="line">           norm=Normalize(vmin=tt.<span class="built_in">min</span>(), vmax=tt.<span class="built_in">max</span>()))</span><br><span class="line">ax.view_init(<span class="number">20</span>,-<span class="number">72</span>)</span><br><span class="line">ax._axis3don=<span class="literal">False</span></span><br><span class="line">ax.set_xlim(-<span class="number">15</span>,<span class="number">20</span>)</span><br><span class="line">ax.set_ylim(<span class="number">0</span>,<span class="number">32</span>)</span><br><span class="line">ax.set_zlim(-<span class="number">15</span>,<span class="number">15</span>)</span><br><span class="line">ax.plot([-<span class="number">15</span>,-<span class="number">15</span>],[<span class="number">0</span>,<span class="number">32</span>],[-<span class="number">15</span>,-<span class="number">15</span>],<span class="string">&#x27;k-&#x27;</span>,lw=<span class="number">2</span>,zorder=-<span class="number">1</span>)</span><br><span class="line">ax.plot([-<span class="number">15</span>,<span class="number">20</span>],[<span class="number">0</span>,<span class="number">0</span>],[-<span class="number">15</span>,-<span class="number">15</span>],<span class="string">&#x27;k-&#x27;</span>,linewidth=<span class="number">2</span>)</span><br><span class="line">ax.plot([-<span class="number">15</span>,-<span class="number">15</span>],[<span class="number">0</span>,<span class="number">0</span>],[-<span class="number">15</span>,<span class="number">15</span>],<span class="string">&#x27;k-&#x27;</span>,linewidth=<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">Y=lle(X,K,d)</span><br><span class="line">ax=fig.add_subplot(<span class="number">2</span>,<span class="number">3</span>,<span class="number">3</span>)</span><br><span class="line">ax.scatter(Y[<span class="number">0</span>,:],Y[<span class="number">1</span>,:],s=<span class="number">12</span>,c=tt,marker=<span class="string">&#x27;+&#x27;</span>,cmap=cm.jet,</span><br><span class="line">           norm=Normalize(vmin=tt.<span class="built_in">min</span>(), vmax=tt.<span class="built_in">max</span>()))</span><br><span class="line">ax.spines[<span class="string">&#x27;right&#x27;</span>].set_visible(<span class="literal">False</span>)</span><br><span class="line">ax.spines[<span class="string">&#x27;top&#x27;</span>].set_visible(<span class="literal">False</span>)</span><br><span class="line">plt.xticks([])</span><br><span class="line">plt.yticks([])</span><br><span class="line"></span><br><span class="line"><span class="comment">#S-curve</span></span><br><span class="line">tt=np.arange(-<span class="number">1</span>,<span class="number">0.51</span>,<span class="number">0.1</span>)*np.pi</span><br><span class="line">uu=np.arange(<span class="number">0.5</span>,-<span class="number">1.1</span>,-<span class="number">0.1</span>)*np.pi</span><br><span class="line">hh=np.arange(<span class="number">0</span>,<span class="number">1.01</span>,<span class="number">0.1</span>)*<span class="number">5</span></span><br><span class="line">xx=np.dot(np.row_stack((np.cos(tt), -<span class="number">1</span>*np.cos(uu))).reshape(<span class="number">32</span>,<span class="number">1</span>),np.ones((<span class="number">1</span>,<span class="number">11</span>)))</span><br><span class="line">yy=np.dot(np.ones((<span class="number">32</span>,<span class="number">1</span>)),hh.reshape(<span class="number">1</span>,<span class="number">11</span>))</span><br><span class="line">zz=np.dot(np.row_stack((np.sin(tt), <span class="number">2</span>-np.sin(uu))).reshape(<span class="number">32</span>,<span class="number">1</span>),np.ones((<span class="number">1</span>,<span class="number">11</span>)))</span><br><span class="line">cc=np.dot(np.row_stack((tt,uu)).reshape(<span class="number">32</span>,<span class="number">1</span>),np.ones((<span class="number">1</span>,<span class="number">11</span>)))</span><br><span class="line"></span><br><span class="line">color_map = cm.jet</span><br><span class="line">scalarMap = cm.ScalarMappable(norm=Normalize(vmin=cc.<span class="built_in">min</span>(), vmax=cc.<span class="built_in">max</span>()), cmap=color_map)</span><br><span class="line">C_colored = scalarMap.to_rgba(cc)</span><br><span class="line"></span><br><span class="line">ax = fig.add_subplot(<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">ax._axis3don = <span class="literal">False</span></span><br><span class="line">surf = ax.plot_surface(xx, yy, zz, rstride=<span class="number">1</span>, cstride=<span class="number">1</span>,</span><br><span class="line">                       facecolors=C_colored,zorder=<span class="number">1</span>)</span><br><span class="line">surf.set_edgecolor(<span class="string">&#x27;k&#x27;</span>)</span><br><span class="line">ax.view_init(<span class="number">10</span>,-<span class="number">70</span>)</span><br><span class="line">ax.set_xlim(-<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line">ax.set_ylim(<span class="number">0</span>,<span class="number">5</span>)</span><br><span class="line">ax.set_zlim(-<span class="number">1</span>,<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">angle=np.pi*(<span class="number">1.5</span>*np.random.rand(<span class="number">1</span>,N/<span class="number">2</span>)-<span class="number">1</span>)</span><br><span class="line">height=<span class="number">5</span>*np.random.rand(<span class="number">1</span>,N)</span><br><span class="line">X=np.row_stack((np.row_stack((np.cos(angle),-<span class="number">1</span>*np.cos(angle))).reshape(<span class="number">1</span>,N),</span><br><span class="line">                height,</span><br><span class="line">                np.row_stack((np.sin(angle),<span class="number">2</span>-np.sin(angle))).reshape(<span class="number">1</span>,N)))</span><br><span class="line"></span><br><span class="line">ax=fig.add_subplot(<span class="number">2</span>,<span class="number">3</span>,<span class="number">5</span>,projection=<span class="string">&#x27;3d&#x27;</span>)</span><br><span class="line">ax.scatter(X[<span class="number">0</span>,:],X[<span class="number">1</span>,:],X[<span class="number">2</span>,:],s=<span class="number">12</span>,c=np.row_stack((angle,angle)).reshape(<span class="number">1</span>,N),</span><br><span class="line">               marker=<span class="string">&#x27;+&#x27;</span>,cmap=cm.jet,</span><br><span class="line">               norm=Normalize(vmin=angle.<span class="built_in">min</span>(), vmax=angle.<span class="built_in">max</span>()))</span><br><span class="line">ax.view_init(<span class="number">10</span>,-<span class="number">70</span>)</span><br><span class="line">ax._axis3don=<span class="literal">False</span></span><br><span class="line">ax.set_xlim(-<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line">ax.set_ylim(<span class="number">0</span>,<span class="number">5</span>)</span><br><span class="line">ax.set_zlim(-<span class="number">1</span>,<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">Y=lle(X,K,d)</span><br><span class="line"></span><br><span class="line">ax=fig.add_subplot(<span class="number">2</span>,<span class="number">3</span>,<span class="number">6</span>)</span><br><span class="line">ax.scatter(Y[<span class="number">1</span>,:],Y[<span class="number">0</span>,:],s=<span class="number">12</span>,c=np.row_stack((angle,angle)).reshape(<span class="number">1</span>,N),marker=<span class="string">&#x27;+&#x27;</span>,cmap=cm.jet,</span><br><span class="line">           norm=Normalize(vmin=angle.<span class="built_in">min</span>(), vmax=angle.<span class="built_in">max</span>()))</span><br><span class="line">ax.spines[<span class="string">&#x27;right&#x27;</span>].set_visible(<span class="literal">False</span>)</span><br><span class="line">ax.spines[<span class="string">&#x27;top&#x27;</span>].set_visible(<span class="literal">False</span>)</span><br><span class="line">plt.xticks([])</span><br><span class="line">plt.yticks([])</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+结果如下：<br><img src="/img/lle.png" alt="lle"><br>lle算法得到的低维结构有些变形，如上图所示，瑞士卷不是长方形的而是从宽到窄，相对而言，S型曲线的结果要好一些。下面介绍modified locally linear embedding算法来解决这个问题。<br>lle算法计算权重矩阵时用到的重构误差函数为$||\mathbf{Gw}||$，理论上$\boldsymbol{1}$在矩阵$\mathbf{G}$的零空间上的正交投影都可以归一化为符合要求的权重向量，那么权重最优解的近似值的个数为矩阵$\mathbf{G}$零空间的维度，可以利用这样的多个权重矩阵描述每个数据点的局部结构，然后来求数据的低维表示。程序参照了sklearn包里面的locally_linear_embedding函数，如下，  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scipy.linalg <span class="keyword">import</span> eigh, svd, qr, solve</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mlle</span>(<span class="params">X,K,d,modified_tol=<span class="number">1E-12</span></span>):</span></span><br><span class="line">    D,N=X.shape</span><br><span class="line">    <span class="comment">#STEP1: COMPUTE PAIRWISE DISTANCES &amp; FIND NEIGHBORS</span></span><br><span class="line">    X2=np.<span class="built_in">sum</span>(X**<span class="number">2</span>,<span class="number">0</span>).reshape(<span class="number">1</span>,N)</span><br><span class="line">    distance=repmat(X2,N,<span class="number">1</span>)+repmat(X2.T,<span class="number">1</span>,N)-<span class="number">2</span>*np.dot(X.T,X)</span><br><span class="line">    index=np.argsort(distance,<span class="number">0</span>)</span><br><span class="line">    neighbors=index[<span class="number">1</span>:<span class="number">1</span>+K,:].T</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">    V = np.zeros((N, K, K))</span><br><span class="line">    nev = <span class="built_in">min</span>(D, K)</span><br><span class="line">    evals = np.zeros([N, nev])</span><br><span class="line">    </span><br><span class="line">    use_svd = (K &gt; D)</span><br><span class="line">    X=X.T</span><br><span class="line">    <span class="keyword">if</span> use_svd:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">            X_nbrs = X[neighbors[i]] - X[i]</span><br><span class="line">            V[i], evals[i], _ = svd(X_nbrs,</span><br><span class="line">                                    full_matrices=<span class="literal">True</span>)</span><br><span class="line">        evals **= <span class="number">2</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">            X_nbrs = X[neighbors[i]] - X[i]</span><br><span class="line">            C_nbrs = np.dot(X_nbrs, X_nbrs.T)</span><br><span class="line">            evi, vi = eigh(C_nbrs)</span><br><span class="line">            evals[i] = evi[::-<span class="number">1</span>]</span><br><span class="line">            V[i] = vi[:, ::-<span class="number">1</span>]</span><br><span class="line">    </span><br><span class="line">    reg = <span class="number">1E-3</span> * evals.<span class="built_in">sum</span>(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    tmp = np.dot(V.transpose(<span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), np.ones(K))</span><br><span class="line">    tmp[:, :nev] /= evals + reg[:, <span class="literal">None</span>]</span><br><span class="line">    tmp[:, nev:] /= reg[:, <span class="literal">None</span>]</span><br><span class="line"></span><br><span class="line">    w_reg = np.zeros((N, K))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">        w_reg[i] = np.dot(V[i], tmp[i])</span><br><span class="line">    w_reg /= w_reg.<span class="built_in">sum</span>(<span class="number">1</span>)[:, <span class="literal">None</span>]</span><br><span class="line">    </span><br><span class="line">    rho = evals[:, d:].<span class="built_in">sum</span>(<span class="number">1</span>) / evals[:, :d].<span class="built_in">sum</span>(<span class="number">1</span>)</span><br><span class="line">    eta = np.median(rho)</span><br><span class="line">    </span><br><span class="line">    s_range = np.zeros(N, dtype=<span class="built_in">int</span>)</span><br><span class="line">    evals_cumsum = np.cumsum(evals, <span class="number">1</span>)</span><br><span class="line">    eta_range = evals_cumsum[:, -<span class="number">1</span>:] / evals_cumsum[:, :-<span class="number">1</span>] - <span class="number">1</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">        s_range[i] = np.searchsorted(eta_range[i, ::-<span class="number">1</span>], eta)</span><br><span class="line">    s_range += K - nev</span><br><span class="line">    </span><br><span class="line">    M = np.zeros((N, N), dtype=np.<span class="built_in">float</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">        s_i = s_range[i]</span><br><span class="line"></span><br><span class="line">        <span class="comment">#select bottom s_i eigenvectors and calculate alpha</span></span><br><span class="line">        Vi = V[i, :, K - s_i:]</span><br><span class="line">        alpha_i = np.linalg.norm(Vi.<span class="built_in">sum</span>(<span class="number">0</span>)) / np.sqrt(s_i)</span><br><span class="line"></span><br><span class="line">            <span class="comment">#compute Householder matrix which satisfies</span></span><br><span class="line">            <span class="comment">#  Hi*Vi.T*ones(n_neighbors) = alpha_i*ones(s)</span></span><br><span class="line">            <span class="comment"># using prescription from paper</span></span><br><span class="line">        h = alpha_i * np.ones(s_i) - np.dot(Vi.T, np.ones(K))</span><br><span class="line"></span><br><span class="line">        norm_h = np.linalg.norm(h)</span><br><span class="line">        <span class="keyword">if</span> norm_h &lt; modified_tol:</span><br><span class="line">            h *= <span class="number">0</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            h /= norm_h</span><br><span class="line"></span><br><span class="line">            <span class="comment">#Householder matrix is</span></span><br><span class="line">            <span class="comment">#  &gt;&gt; Hi = np.identity(s_i) - 2*np.outer(h,h)</span></span><br><span class="line">            <span class="comment">#Then the weight matrix is</span></span><br><span class="line">            <span class="comment">#  &gt;&gt; Wi = np.dot(Vi,Hi) + (1-alpha_i) * w_reg[i,:,None]</span></span><br><span class="line">            <span class="comment">#We do this much more efficiently:</span></span><br><span class="line">            Wi = (Vi - <span class="number">2</span> * np.outer(np.dot(Vi, h), h)</span><br><span class="line">                  + (<span class="number">1</span> - alpha_i) * w_reg[i, :, <span class="literal">None</span>])</span><br><span class="line"></span><br><span class="line">            <span class="comment">#Update M as follows:</span></span><br><span class="line">            <span class="comment"># &gt;&gt; W_hat = np.zeros( (N,s_i) )</span></span><br><span class="line">            <span class="comment"># &gt;&gt; W_hat[neighbors[i],:] = Wi</span></span><br><span class="line">            <span class="comment"># &gt;&gt; W_hat[i] -= 1</span></span><br><span class="line">            <span class="comment"># &gt;&gt; M += np.dot(W_hat,W_hat.T)</span></span><br><span class="line">            <span class="comment">#We can do this much more efficiently:</span></span><br><span class="line">            nbrs_x, nbrs_y = np.meshgrid(neighbors[i], neighbors[i])</span><br><span class="line">            M[nbrs_x, nbrs_y] += np.dot(Wi, Wi.T)</span><br><span class="line">            Wi_sum1 = Wi.<span class="built_in">sum</span>(<span class="number">1</span>)</span><br><span class="line">            M[i, neighbors[i]] -= Wi_sum1</span><br><span class="line">            M[neighbors[i], i] -= Wi_sum1</span><br><span class="line">            M[i, i] += s_i</span><br><span class="line">    M=sp.csr_matrix(M)</span><br><span class="line">    <span class="built_in">print</span> <span class="string">&#x27;begin solving eigenvectors&#x27;</span></span><br><span class="line">    eigenvals, Y=eigsh(M,d+<span class="number">1</span>,sigma=<span class="number">0.0</span>,tol=<span class="number">1e-12</span>)</span><br><span class="line">    Y_r=Y[:,<span class="number">1</span>:].T*(np.sqrt(N))</span><br><span class="line">    <span class="keyword">return</span> Y_r</span><br></pre></td></tr></table></figure>
+用mlle算法重新跑瑞士卷和S-曲线的数据，结果如下，<br><img src="/img/mlle.png" alt="mlle"><br>得到的2维结构正好是长方形。  </li>
+</ol>
+<p><strong>参考文献</strong>：  </p>
+<ol>
+<li>S. Roweis and L Saul. Nonlinear dimensionality reduction by locally linear embedding. Science, 290: 2323–2326, 2000.</li>
+<li>Zhang, Z. &amp; Wang, J. MLLE: Modified Locally Linear Embedding Using Multiple Weights. <a target="_blank" rel="noopener" href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.70.382">http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.70.382</a>  </li>
+<li><a target="_blank" rel="noopener" href="http://www.cs.nyu.edu/~roweis/lle/">http://www.cs.nyu.edu/~roweis/lle/</a></li>
+<li><a target="_blank" rel="noopener" href="http://scikit-learn.org/stable/modules/generated/sklearn.manifold.locally_linear_embedding.html">http://scikit-learn.org/stable/modules/generated/sklearn.manifold.locally_linear_embedding.html</a></li>
+</ol>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://mtpgm.com/2015/08/14/lle/" data-id="cklwgcww20004l4wpgrx10han" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2015/08/14/lle/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2015/08/14/lle/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2015/08/17/t-sne/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Newer</strong>
+            <div class="article-nav-title">
+                
+                    t-SNE:高维数据可视化
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2015/07/10/rock/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">分类型变量的聚类算法 - ROCK</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2015/08/14/lle/" data-title="非线性维度下降之局部线性插值" data-url="http://mtpgm.com/2015/08/14/lle/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/03/03/Prototype-Pattern/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/03/Prototype-Pattern/" class="title">Prototype Pattern</a></p>
+                            <p class="item-date"><time datetime="2021-03-03T12:03:33.000Z" itemprop="datePublished">2021-03-03</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2017/01/11/tensorflow/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2017/01/11/tensorflow/" class="title">Tensorflow基础</a></p>
+                            <p class="item-date"><time datetime="2017-01-11T12:51:03.000Z" itemprop="datePublished">2017-01-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/27/activityflow/" class="thumbnail">
+    
+    
+        <span style="background-image:url(/img/activityflow.png)" alt="静态fMRI数据中的信息流动" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/27/activityflow/" class="title">静态fMRI数据中的信息流动</a></p>
+                            <p class="item-date"><time datetime="2016-12-27T01:36:25.000Z" itemprop="datePublished">2016-12-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/18/Cplus-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/18/Cplus-programming/" class="title">C++程序设计</a></p>
+                            <p class="item-date"><time datetime="2016-12-18T08:07:56.000Z" itemprop="datePublished">2016-12-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2016/12/17/C-programming/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2016/12/17/C-programming/" class="title">C语言学习</a></p>
+                            <p class="item-date"><time datetime="2016-12-17T10:40:08.000Z" itemprop="datePublished">2016-12-17</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">March 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/" rel="tag">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Creational-Design-Pattern/" rel="tag">Creational Design Pattern</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/" rel="tag">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deep-learning/" rel="tag">deep learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" rel="tag">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" rel="tag">测度论</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/Creational-Design-Pattern/" style="font-size: 10px;">Creational Design Pattern</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/deep-learning/" style="font-size: 10px;">deep learning</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">机器学习</a> <a href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" style="font-size: 10px;">测度论</a>
+        </div>
+    </div>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2021 mtpgm<br>
+        </div>
+    </div>
+</footer>
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'true'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
