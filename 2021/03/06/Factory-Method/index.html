@@ -3,18 +3,19 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Hello World | Game Programming</title>
+    <title>Factory Method | Game Programming</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+    <meta name="description" content="工厂模式的一种，工厂方法，把对象的创建与对象的使用分离开。一个工厂只能创建一种相似的对象。每个子工厂创建一种对象，有相同的创建接口，由用户选择使用哪个工厂。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://mtpgm.com/2021/03/01/hello-world/index.html">
+<meta property="og:title" content="Factory Method">
+<meta property="og:url" content="http://mtpgm.com/2021/03/06/Factory-Method/index.html">
 <meta property="og:site_name" content="Game Programming">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="工厂模式的一种，工厂方法，把对象的创建与对象的使用分离开。一个工厂只能创建一种相似的对象。每个子工厂创建一种对象，有相同的创建接口，由用户选择使用哪个工厂。">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-03-01T03:01:34.844Z">
-<meta property="article:modified_time" content="2021-03-01T03:01:34.844Z">
+<meta property="article:published_time" content="2021-03-06T01:53:10.000Z">
+<meta property="article:modified_time" content="2021-03-06T06:31:17.590Z">
 <meta property="article:author" content="mtpgm">
+<meta property="article:tag" content="Creational Design Pattern">
 <meta name="twitter:card" content="summary">
     
 
@@ -182,7 +183,7 @@ var _hmt = _hmt || [];
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                11
+                12
                 <span>posts</span>
             </div>
             <div class="article-info-block">
@@ -234,7 +235,7 @@ var _hmt = _hmt || [];
 </aside>
 
             
-            <section id="main"><article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-Factory-Method" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -242,7 +243,7 @@ var _hmt = _hmt || [];
                 
     
         <h1 class="article-title" itemprop="name">
-            Hello World
+            Factory Method
         </h1>
     
 
@@ -251,14 +252,19 @@ var _hmt = _hmt || [];
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2021/03/01/hello-world/">
-            <time datetime="2021-03-01T03:01:34.844Z" itemprop="datePublished">2021-03-01</time>
+        <a href="/2021/03/06/Factory-Method/">
+            <time datetime="2021-03-06T01:53:10.000Z" itemprop="datePublished">2021-03-06</time>
         </a>
     </div>
 
 
                         
                         
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Creational-Design-Pattern/" rel="tag">Creational Design Pattern</a>
+    </div>
+
                     </div>
                 
             </header>
@@ -267,19 +273,7 @@ var _hmt = _hmt || [];
         <div class="article-entry" itemprop="articleBody">
         
             
-            <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+            <p>工厂模式的一种，工厂方法，把对象的创建与对象的使用分离开。<br>一个工厂只能创建一种相似的对象。<br>每个子工厂创建一种对象，有相同的创建接口，由用户选择使用哪个工厂。</p>
 
         
         </div>
@@ -290,7 +284,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://mtpgm.com/2021/03/01/hello-world/" data-id="cklq4c1qt00016gvi31o77p93" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2021/03/06/Factory-Method/" data-id="cklxgcp7r0001ewvi7w9ehh5q" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -358,7 +352,7 @@ var _hmt = _hmt || [];
 
             
     
-        <a href="http://mtpgm.com/2021/03/01/hello-world/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2021/03/01/hello-world/">Comments</a>
+        <a href="http://mtpgm.com/2021/03/06/Factory-Method/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2021/03/06/Factory-Method/">Comments</a>
     
 
         </footer>
@@ -367,19 +361,19 @@ var _hmt = _hmt || [];
         
 <nav id="article-nav">
     
-        <a href="/2021/03/03/Prototype-Pattern/" id="article-nav-newer" class="article-nav-link-wrap">
+        <a href="/2021/03/06/Abstract-Factory/" id="article-nav-newer" class="article-nav-link-wrap">
             <strong class="article-nav-caption">Newer</strong>
             <div class="article-nav-title">
                 
-                    Prototype Pattern
+                    Abstract Factory
                 
             </div>
         </a>
     
     
-        <a href="/2017/01/11/tensorflow/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2021/03/03/Prototype-Pattern/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">Older</strong>
-            <div class="article-nav-title">Tensorflow基础</div>
+            <div class="article-nav-title">Prototype Pattern</div>
         </a>
     
 </nav>
@@ -393,7 +387,7 @@ var _hmt = _hmt || [];
     <section id="comments">
     
         
-    <div class="ds-thread" data-thread-key="2021/03/01/hello-world/" data-title="Hello World" data-url="http://mtpgm.com/2021/03/01/hello-world/"></div>
+    <div class="ds-thread" data-thread-key="2021/03/06/Factory-Method/" data-title="Factory Method" data-url="http://mtpgm.com/2021/03/06/Factory-Method/"></div>
     <style>
         #ds-thread #ds-reset .ds-textarea-wrapper {
             background: none;
@@ -448,6 +442,44 @@ var _hmt = _hmt || [];
                     <li>
                         
                         <div class="item-thumbnail">
+                            <a href="/2021/03/06/Abstract-Factory/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/06/Abstract-Factory/" class="title">Abstract Factory</a></p>
+                            <p class="item-date"><time datetime="2021-03-06T04:48:40.000Z" itemprop="datePublished">2021-03-06</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/03/06/Factory-Method/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/06/Factory-Method/" class="title">Factory Method</a></p>
+                            <p class="item-date"><time datetime="2021-03-06T01:53:10.000Z" itemprop="datePublished">2021-03-06</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
                             <a href="/2021/03/03/Prototype-Pattern/" class="thumbnail">
     
     
@@ -461,25 +493,6 @@ var _hmt = _hmt || [];
                             <p class="item-category"></p>
                             <p class="item-title"><a href="/2021/03/03/Prototype-Pattern/" class="title">Prototype Pattern</a></p>
                             <p class="item-date"><time datetime="2021-03-03T12:03:33.000Z" itemprop="datePublished">2021-03-03</time></p>
-                        </div>
-                    </li>
-                
-                    <li>
-                        
-                        <div class="item-thumbnail">
-                            <a href="/2021/03/01/hello-world/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div>
-                        
-                        <div class="item-inner">
-                            <p class="item-category"></p>
-                            <p class="item-title"><a href="/2021/03/01/hello-world/" class="title">Hello World</a></p>
-                            <p class="item-date"><time datetime="2021-03-01T03:01:34.844Z" itemprop="datePublished">2021-03-01</time></p>
                         </div>
                     </li>
                 
@@ -521,25 +534,6 @@ var _hmt = _hmt || [];
                         </div>
                     </li>
                 
-                    <li>
-                        
-                        <div class="item-thumbnail">
-                            <a href="/2016/12/18/Cplus-programming/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div>
-                        
-                        <div class="item-inner">
-                            <p class="item-category"></p>
-                            <p class="item-title"><a href="/2016/12/18/Cplus-programming/" class="title">C++程序设计</a></p>
-                            <p class="item-date"><time datetime="2016-12-18T08:07:56.000Z" itemprop="datePublished">2016-12-18</time></p>
-                        </div>
-                    </li>
-                
             </ul>
         </div>
     </div>
@@ -551,7 +545,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">archives</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">March 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">March 2021</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
         </div>
     </div>
 
@@ -560,7 +554,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">tags</h3>
         <div class="widget">
-            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/" rel="tag">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Creational-Design-Pattern/" rel="tag">Creational Design Pattern</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/" rel="tag">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deep-learning/" rel="tag">deep learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" rel="tag">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" rel="tag">测度论</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/" rel="tag">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Creational-Design-Pattern/" rel="tag">Creational Design Pattern</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/" rel="tag">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deep-learning/" rel="tag">deep learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" rel="tag">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" rel="tag">测度论</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -569,7 +563,7 @@ var _hmt = _hmt || [];
     <div class="widget-wrap">
         <h3 class="widget-title">tag cloud</h3>
         <div class="widget tagcloud">
-            <a href="/tags/C-C/" style="font-size: 20px;">C/C++</a> <a href="/tags/Creational-Design-Pattern/" style="font-size: 10px;">Creational Design Pattern</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/deep-learning/" style="font-size: 10px;">deep learning</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 20px;">机器学习</a> <a href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" style="font-size: 10px;">测度论</a>
+            <a href="/tags/C-C/" style="font-size: 15px;">C/C++</a> <a href="/tags/Creational-Design-Pattern/" style="font-size: 20px;">Creational Design Pattern</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/deep-learning/" style="font-size: 10px;">deep learning</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 15px;">机器学习</a> <a href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" style="font-size: 10px;">测度论</a>
         </div>
     </div>
 
