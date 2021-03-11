@@ -130,3 +130,10 @@ context.DrawRenderers(cullResults.visibleRenderers, ref drs, opaqueRange);
 // submit the context, this will execute all of the queued up commands.
 context.Submit();
 ```
+
+* Custom SRP
+    * inherit RenderPipelineAsset, override CreatePipeline()
+    * inherit RenderPipeline, override Render()
+    * create a Render Pipeline Asset from customed RenderPipelineAsset script
+
+
