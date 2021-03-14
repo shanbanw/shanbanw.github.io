@@ -141,3 +141,59 @@ Tags { "TagName1" = "Value1" "TagName2" = "Value2" }
 
 * #### RequireOptions - 指定满足某些条件时才渲染
     * SoftVegetation - Render this pass only if Soft Vegetation is on in the quality window.
+
+#### Render State Set-up
+```HLSL
+// Set polygon culling mode
+Cull Back | Front | Off
+// Set depth buffer testing mode, default (LEqual)
+ZTest (Less | Greater | LEqual | GEqual | Equal | NotEqual | Always)
+// Set depth buffer writing mode, default (On)
+ZWrite On | Off
+// Set Z buffer depth offset, Factor scales the maximum Z slope, with respect to X or Y of the polygon; units scale the minimum resolvable depth buffer value.
+Offset Factor, Units
+// Sets alpha blending, alpha operation, and alpha-to-coverage modes
+Blend sourceBlendMode destBlendMode
+Blend sourceBlendMode destBlendMode, alphaSourceBlendMode alphaDestBlendMode
+BlendOp colorOp
+BlendOp colorOp, alphaOp
+AlphaToMask On | Off
+// Set conservative rasterization on and off
+Conservative True | False
+// Set color channel writing mask. Writing ColorMask 0 turns off rendering to all color channels. Default mode is writing to all channels (RGBA), but for some special effects you might want to leave certain channels unmodified, or disable color writes completely.
+
+When using multiple render target (MRT) rendering, it is possible to set up different color masks for each render target, by adding index (0–7) at the end. For example, ColorMask RGB 3 would make render target #3 write only to RGB channels.
+
+ColorMask RGB | A | 0 | any combination of R, G, B, A
+```
+#### Debugging Normals
+first we render the object with normal vertex lighting, then we render the backfaces in bright pink. This has the effects of highlighting anywhere your normals need to be flipped.
+```HLSL
+Shader "Reveal Backfaces" {
+    Properties {
+        _MainTex ("Base (RGB)", 2D) = "white" { }
+    }
+    SubShader {
+        // Render the front-facing parts of the object.
+        // We use a simple white material, and apply the main texture.
+        Pass {
+            Material {
+                Diffuse (1,1,1,1)
+            }
+            Lighting On
+            SetTexture [_MainTex] {
+                Combine Primary * Texture
+            }
+        }
+
+        // Now we render the back-facing triangles in the most
+        // irritating color in the world: BRIGHT PINK!
+        Pass {
+            Color (1,0,1,1)
+            Cull Front
+        }
+    }
+}
+```
+
+#### 
