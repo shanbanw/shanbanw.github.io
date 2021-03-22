@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Event Bus | Game Programming</title>
+    <title>ShaderLab Syntax | Game Programming</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="消息系统，发布-订阅系统">
+    <meta name="description" content="Syntax1Shader &quot;name&quot; &amp;#123; [Properties] Subshaders [Fallback] [CustomEditor] &amp;#125; []代表可选">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Event Bus">
-<meta property="og:url" content="http://mtpgm.com/2021/03/10/Event-Bus/index.html">
+<meta property="og:title" content="ShaderLab Syntax">
+<meta property="og:url" content="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/index.html">
 <meta property="og:site_name" content="Game Programming">
-<meta property="og:description" content="消息系统，发布-订阅系统">
+<meta property="og:description" content="Syntax1Shader &quot;name&quot; &amp;#123; [Properties] Subshaders [Fallback] [CustomEditor] &amp;#125; []代表可选">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2021-03-10T02:01:44.000Z">
-<meta property="article:modified_time" content="2021-03-10T02:06:56.855Z">
+<meta property="article:published_time" content="2021-03-11T06:09:20.000Z">
+<meta property="article:modified_time" content="2021-03-15T01:52:53.352Z">
 <meta property="article:author" content="mtpgm">
-<meta property="article:tag" content="Decoupling Pattern">
+<meta property="article:tag" content="Unity SRP">
 <meta name="twitter:card" content="summary">
     
 
@@ -235,7 +235,7 @@ var _hmt = _hmt || [];
 </aside>
 
             
-            <section id="main"><article id="post-Event-Bus" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-ShaderLab-Syntax" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -243,7 +243,7 @@ var _hmt = _hmt || [];
                 
     
         <h1 class="article-title" itemprop="name">
-            Event Bus
+            ShaderLab Syntax
         </h1>
     
 
@@ -252,8 +252,8 @@ var _hmt = _hmt || [];
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2021/03/10/Event-Bus/">
-            <time datetime="2021-03-10T02:01:44.000Z" itemprop="datePublished">2021-03-10</time>
+        <a href="/2021/03/11/ShaderLab-Syntax/">
+            <time datetime="2021-03-11T06:09:20.000Z" itemprop="datePublished">2021-03-11</time>
         </a>
     </div>
 
@@ -262,7 +262,7 @@ var _hmt = _hmt || [];
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link-link" href="/tags/Decoupling-Pattern/" rel="tag">Decoupling Pattern</a>
+        <a class="tag-link-link" href="/tags/Unity-SRP/" rel="tag">Unity SRP</a>
     </div>
 
                     </div>
@@ -273,8 +273,124 @@ var _hmt = _hmt || [];
         <div class="article-entry" itemprop="articleBody">
         
             
-            <p>消息系统，发布-订阅系统</p>
+            <h1 id="Syntax"><a href="#Syntax" class="headerlink" title="Syntax"></a>Syntax</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Shader &quot;name&quot; &#123; [Properties] Subshaders [Fallback] [CustomEditor] &#125;</span><br></pre></td></tr></table></figure>
+<p>[]代表可选</p>
+<span id="more"></span>
 
+<h1 id="Properties"><a href="#Properties" class="headerlink" title="Properties"></a>Properties</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Properties &#123; Property [Property] ... &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Numbers-and-Sliders"><a href="#Numbers-and-Sliders" class="headerlink" title="Numbers and Sliders"></a>Numbers and Sliders</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name (&quot;display name&quot;, Range (min, max)) &#x3D; number</span><br><span class="line">name (&quot;display name&quot;, Float) &#x3D; number</span><br><span class="line">name (&quot;display name&quot;, Int) &#x3D; number</span><br></pre></td></tr></table></figure>
+<h4 id="Colors-and-Vectors"><a href="#Colors-and-Vectors" class="headerlink" title="Colors and Vectors"></a>Colors and Vectors</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">name (&quot;display name&quot;, Color) &#x3D; (number, number, number, number)</span><br><span class="line">name (&quot;display name&quot;, Vector) &#x3D; (number, number, number, number)</span><br></pre></td></tr></table></figure>
+<h4 id="Textures"><a href="#Textures" class="headerlink" title="Textures"></a>Textures</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name (&quot;display name&quot;, 2D) &#x3D; &quot;defaulttexture&quot; &#123;&#125;</span><br><span class="line">name (&quot;display name&quot;, Cube) &#x3D; &quot;defaulttexture&quot; &#123;&#125;</span><br><span class="line">name (&quot;display name&quot;, 3D) &#x3D; &quot;defaulttexture&quot; &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h4><ul>
+<li>unity中shader property name一般以_开头。</li>
+<li>2D Textures - 默认值可以是空字符串，或是built-in 默认贴图: “white”, “black”, “gray”, “bump” (RGBA: 0.5, 0.5, 1, 0.5) and “red” (RGBA: 1, 0, 0, 0).</li>
+<li>Non-2D Textures (Cube, 3D, 2DArray) - 默认值是空字符串。</li>
+</ul>
+<p>Properties里面的参数是和材质数据一起序列化的，外面的参数不会被保存，用于runtime脚本控制(such as Material.SetFloat)</p>
+<h4 id="Property-attributes-and-drawers"><a href="#Property-attributes-and-drawers" class="headerlink" title="Property attributes and drawers"></a>Property attributes and drawers</h4><ul>
+<li>[HideInInspector] - 不出现在material inspector</li>
+<li>[NoScaleOffset] - 不显示Texture tiling/offset</li>
+<li>[Normal] - normal map</li>
+<li>[HDR] - high-dynamic range (HDR) texture</li>
+<li>[Gamma] </li>
+<li>[PerRendererData] - come from pre-renderer data, read-only</li>
+<li>[MainTexture] - unity默认使用_MainTex作为main texture,如果有多个，unity使用第一个。</li>
+<li>[MainColor] - unity默认使用_Color作为main color,如果有多个，unity使用第一个。</li>
+</ul>
+<h1 id="SubShaders-amp-Fallback"><a href="#SubShaders-amp-Fallback" class="headerlink" title="SubShaders &amp; Fallback"></a>SubShaders &amp; Fallback</h1><p>每个shader可以有多个subshaders. 当Unity加载shader时，会从subshaders中找到第一个机器支持的subshader，如果没有，就会使用fall back shader.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subshader &#123; [Tags] [CommonState] Passdef [Passdef] ...&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="SubShader-Tags-to-tell-how-and-when-they-expect-to-be-rendered-to-the-rendering-engine"><a href="#SubShader-Tags-to-tell-how-and-when-they-expect-to-be-rendered-to-the-rendering-engine" class="headerlink" title="SubShader Tags - to tell how and when they expect to be rendered to the rendering engine."></a>SubShader Tags - to tell how and when they expect to be rendered to the rendering engine.</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tags &#123; &quot;TagName1&quot; &#x3D; &quot;Value1&quot; &quot;TagName2&quot; &#x3D; &quot;Value2&quot; &#125;</span><br></pre></td></tr></table></figure>
+<p>以下tags必须放在subshader中， 不能Pass中</p>
+<ul>
+<li><h4 id="Queue-Rendering-Order"><a href="#Queue-Rendering-Order" class="headerlink" title="Queue - Rendering Order"></a>Queue - Rendering Order</h4><ul>
+<li>Background - 1000</li>
+<li>Geometry - 2000</li>
+<li>AlphaTest - 2450</li>
+<li>Transparent - 3000</li>
+<li>Overlay - 4000</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tags &#123; &quot;Queue&quot; &#x3D; &quot;Geometry+1&quot; &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><h4 id="DisableBatching-draw-call-batching-transforms-all-geometry-into-world-space"><a href="#DisableBatching-draw-call-batching-transforms-all-geometry-into-world-space" class="headerlink" title="DisableBatching - draw call batching transforms all geometry into world space"></a>DisableBatching - draw call batching transforms all geometry into world space</h4><ul>
+<li>True - always disables batching for this shader</li>
+<li>False - does not disable batching; default</li>
+<li>LODFading - disable batching when LOD fading is active; mostly used on trees</li>
+</ul>
+</li>
+<li><h4 id="ForceNoShadowCasting"><a href="#ForceNoShadowCasting" class="headerlink" title="ForceNoShadowCasting"></a>ForceNoShadowCasting</h4><ul>
+<li>True - an object that is rendered using this subshader will never cast shadows.</li>
+</ul>
+</li>
+<li><h4 id="IgnoreProjector"><a href="#IgnoreProjector" class="headerlink" title="IgnoreProjector"></a>IgnoreProjector</h4><ul>
+<li>True - will not be effected by Projectors.</li>
+</ul>
+</li>
+<li><h4 id="CanUseSpriteAltas"><a href="#CanUseSpriteAltas" class="headerlink" title="CanUseSpriteAltas"></a>CanUseSpriteAltas</h4><ul>
+<li>False - meant for sprites, not work when they are packed into atlases</li>
+</ul>
+</li>
+<li><h4 id="PreviewType-how-the-material-inspector-preview-should-display-the-material"><a href="#PreviewType-how-the-material-inspector-preview-should-display-the-material" class="headerlink" title="PreviewType - how the material inspector preview should display the material."></a>PreviewType - how the material inspector preview should display the material.</h4><ul>
+<li>Sphere - default</li>
+<li>Plane - 2D</li>
+<li>Skybox - skybox</li>
+</ul>
+</li>
+<li><h4 id="RenderType-Categorize-shaders-into-several-perdefined-groups-used-by-shader-replacement"><a href="#RenderType-Categorize-shaders-into-several-perdefined-groups-used-by-shader-replacement" class="headerlink" title="RenderType - Categorize shaders into several perdefined groups, used by shader replacement."></a>RenderType - Categorize shaders into several perdefined groups, used by shader replacement.</h4><ul>
+<li>Opaque</li>
+<li>Transparent</li>
+<li>TransparentCutout - masked transparency shaders</li>
+<li>Background - skybox</li>
+<li>Overlay - Halo, flare shaders</li>
+<li>TreeOpaque - terrain engine tree bark</li>
+<li>TreeTransparentCutout - terrain engine billboarded trees</li>
+<li>Grass - terrain engine grass</li>
+<li>GrassBillboard - terrain engine billboarded grass</li>
+</ul>
+</li>
+</ul>
+<h4 id="Any-statements-that-are-allowed-in-a-Pass-definition-can-also-appear-in-Subshader-block-This-will-make-all-passes-use-this-“shared”-state"><a href="#Any-statements-that-are-allowed-in-a-Pass-definition-can-also-appear-in-Subshader-block-This-will-make-all-passes-use-this-“shared”-state" class="headerlink" title="Any statements that are allowed in a Pass definition can also appear in Subshader block. This will make all passes use this “shared” state."></a>Any statements that are allowed in a Pass definition can also appear in Subshader block. This will make all passes use this “shared” state.</h4><ul>
+<li>Three Type of Pass<ul>
+<li>Regular Pass</li>
+<li>Use Pass</li>
+<li>Grab Pass</li>
+</ul>
+</li>
+</ul>
+<h4 id="Regular-Pass"><a href="#Regular-Pass" class="headerlink" title="Regular Pass"></a>Regular Pass</h4><p>每个pass渲染一次geometry</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Pass &#123; [Name and Tags] [RenderSetup] &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Name"><a href="#Name" class="headerlink" title="Name"></a>Name</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Name &quot;PASSNAME&quot;</span><br></pre></td></tr></table></figure>
+<p>定义一个名字，一般用大写，用于UsePass</p>
+<h4 id="Tags"><a href="#Tags" class="headerlink" title="Tags"></a>Tags</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tags &#123; &quot;TagName1&quot; &#x3D; &quot;Value1&quot; &quot;TagName2&quot; &#x3D; &quot;Value2&quot; &#125;</span><br></pre></td></tr></table></figure>
+<p>用于确定渲染方式和渲染时间<br>以下Tags必须放在Pass中，不能放在SubShader中</p>
+<ul>
+<li><h4 id="LightMode"><a href="#LightMode" class="headerlink" title="LightMode"></a>LightMode</h4><ul>
+<li>Always - Always rendered; no lighting is applied.</li>
+<li>ForwardBase - Used in Forward rendering, ambient, main directional light, vertex/SH lights and lightmaps are applied.</li>
+<li>ForwardAdd - Used in Forward rendering; additive per-pixel lights are applied, one pass per light.</li>
+<li>Deferred - Used in Deferred Shading; renders g-buffer.</li>
+<li>ShadowCaster - Renders object depth into shadowmap or a depth texture.</li>
+<li>MotionVectors - Used to calculate per-object motion vectors.</li>
+</ul>
+</li>
+<li><h4 id="PassFlags-指定rendering-pipeline如何给pass传递数据"><a href="#PassFlags-指定rendering-pipeline如何给pass传递数据" class="headerlink" title="PassFlags - 指定rendering pipeline如何给pass传递数据"></a>PassFlags - 指定rendering pipeline如何给pass传递数据</h4><ul>
+<li>OnlyDirectional - only the main directional light and ambient/lightprobe data is passed into shader.</li>
+</ul>
+</li>
+<li><h4 id="RequireOptions-指定满足某些条件时才渲染"><a href="#RequireOptions-指定满足某些条件时才渲染" class="headerlink" title="RequireOptions - 指定满足某些条件时才渲染"></a>RequireOptions - 指定满足某些条件时才渲染</h4><ul>
+<li>SoftVegetation - Render this pass only if Soft Vegetation is on in the quality window.</li>
+</ul>
+</li>
+</ul>
+<h4 id="Render-State-Set-up"><a href="#Render-State-Set-up" class="headerlink" title="Render State Set-up"></a>Render State Set-up</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; Set polygon culling mode</span><br><span class="line">Cull Back | Front | Off</span><br><span class="line">&#x2F;&#x2F; Set depth buffer testing mode, default (LEqual)</span><br><span class="line">ZTest (Less | Greater | LEqual | GEqual | Equal | NotEqual | Always)</span><br><span class="line">&#x2F;&#x2F; Set depth buffer writing mode, default (On)</span><br><span class="line">ZWrite On | Off</span><br><span class="line">&#x2F;&#x2F; Set Z buffer depth offset, Factor scales the maximum Z slope, with respect to X or Y of the polygon; units scale the minimum resolvable depth buffer value.</span><br><span class="line">Offset Factor, Units</span><br><span class="line">&#x2F;&#x2F; Sets alpha blending, alpha operation, and alpha-to-coverage modes</span><br><span class="line">Blend sourceBlendMode destBlendMode</span><br><span class="line">Blend sourceBlendMode destBlendMode, alphaSourceBlendMode alphaDestBlendMode</span><br><span class="line">BlendOp colorOp</span><br><span class="line">BlendOp colorOp, alphaOp</span><br><span class="line">AlphaToMask On | Off</span><br><span class="line">&#x2F;&#x2F; Set conservative rasterization on and off</span><br><span class="line">Conservative True | False</span><br><span class="line">&#x2F;&#x2F; Set color channel writing mask. Writing ColorMask 0 turns off rendering to all color channels. Default mode is writing to all channels (RGBA), but for some special effects you might want to leave certain channels unmodified, or disable color writes completely.</span><br><span class="line"></span><br><span class="line">When using multiple render target (MRT) rendering, it is possible to set up different color masks for each render target, by adding index (0–7) at the end. For example, ColorMask RGB 3 would make render target #3 write only to RGB channels.</span><br><span class="line"></span><br><span class="line">ColorMask RGB | A | 0 | any combination of R, G, B, A</span><br></pre></td></tr></table></figure>
+<h4 id="Debugging-Normals"><a href="#Debugging-Normals" class="headerlink" title="Debugging Normals"></a>Debugging Normals</h4><p>first we render the object with normal vertex lighting, then we render the backfaces in bright pink. This has the effects of highlighting anywhere your normals need to be flipped.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Shader &quot;Reveal Backfaces&quot; &#123;</span><br><span class="line">    Properties &#123;</span><br><span class="line">        _MainTex (&quot;Base (RGB)&quot;, 2D) &#x3D; &quot;white&quot; &#123; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    SubShader &#123;</span><br><span class="line">        &#x2F;&#x2F; Render the front-facing parts of the object.</span><br><span class="line">        &#x2F;&#x2F; We use a simple white material, and apply the main texture.</span><br><span class="line">        Pass &#123;</span><br><span class="line">            Material &#123;</span><br><span class="line">                Diffuse (1,1,1,1)</span><br><span class="line">            &#125;</span><br><span class="line">            Lighting On</span><br><span class="line">            SetTexture [_MainTex] &#123;</span><br><span class="line">                Combine Primary * Texture</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; Now we render the back-facing triangles in the most</span><br><span class="line">        &#x2F;&#x2F; irritating color in the world: BRIGHT PINK!</span><br><span class="line">        Pass &#123;</span><br><span class="line">            Color (1,0,1,1)</span><br><span class="line">            Cull Front</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id=""><a href="#" class="headerlink" title=""></a></h4>
         
         </div>
         <footer class="article-footer">
@@ -284,7 +400,7 @@ var _hmt = _hmt || [];
 
 </div>
 
-    <a data-url="http://mtpgm.com/2021/03/10/Event-Bus/" data-id="ckm365wbf00047gvi6eqlgfvw" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+    <a data-url="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/" data-id="ckm4nodot0000jsvi1707dcxk" class="article-share-link"><i class="fa fa-share"></i>Share</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -352,7 +468,7 @@ var _hmt = _hmt || [];
 
             
     
-        <a href="http://mtpgm.com/2021/03/10/Event-Bus/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2021/03/10/Event-Bus/">Comments</a>
+        <a href="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/">Comments</a>
     
 
         </footer>
@@ -361,19 +477,19 @@ var _hmt = _hmt || [];
         
 <nav id="article-nav">
     
-        <a href="/2021/03/10/Service-Locator/" id="article-nav-newer" class="article-nav-link-wrap">
+        <a href="/2021/03/14/Asset/" id="article-nav-newer" class="article-nav-link-wrap">
             <strong class="article-nav-caption">Newer</strong>
             <div class="article-nav-title">
                 
-                    Service Locator
+                    Asset
                 
             </div>
         </a>
     
     
-        <a href="/2021/03/09/Decorator/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2021/03/10/Scriptable-Render-Pipeline/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">Older</strong>
-            <div class="article-nav-title">Decorator</div>
+            <div class="article-nav-title">Scriptable Render Pipeline</div>
         </a>
     
 </nav>
@@ -387,7 +503,7 @@ var _hmt = _hmt || [];
     <section id="comments">
     
         
-    <div class="ds-thread" data-thread-key="2021/03/10/Event-Bus/" data-title="Event Bus" data-url="http://mtpgm.com/2021/03/10/Event-Bus/"></div>
+    <div class="ds-thread" data-thread-key="2021/03/11/ShaderLab-Syntax/" data-title="ShaderLab Syntax" data-url="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/"></div>
     <style>
         #ds-thread #ds-reset .ds-textarea-wrapper {
             background: none;
