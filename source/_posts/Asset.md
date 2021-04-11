@@ -9,7 +9,7 @@ Unity stores the internal representation of your assets in the Library folder wh
 
 <!-- More -->
 
-## Asset Database
+## AssetDatabase
 
 ## Resource Folders
 Inclued in the built Unity Player.
@@ -32,3 +32,5 @@ load - AssetBundle.LoadAsset()
 unload - AssetBundle.Unload() AssetBundle.UnloadAsync(bool)
 
 ## Addressable Asset System
+使用weak references
+https://blogs.unity3d.com/2021/03/31/tales-from-the-optimization-trenches-saving-memory-with-addressables/
