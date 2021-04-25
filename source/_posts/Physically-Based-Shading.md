@@ -11,3 +11,6 @@ $f(p, \omega_{o}, \omega_{i})$ is BRDF.
 $\cos\theta_{i}$ is the dot between normal and light direction.
 <!-- more -->
 基于物理的着色算法就是计算视线方向的Radiance.
+Rayleigh scattering - 粒子直径远小于光的波长
+Mie scattering - 粒子直径与波长相近
+Geometry scattering - 粒子直径远大于波长
