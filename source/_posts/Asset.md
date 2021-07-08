@@ -10,6 +10,8 @@ Unity stores the internal representation of your assets in the Library folder wh
 <!-- More -->
 
 ## AssetDatabase
+开发阶段使用
+AssetDatabase.LoadAssetAtPath()
 
 ## Resource Folders
 Inclued in the built Unity Player.
@@ -32,5 +34,8 @@ load - AssetBundle.LoadAsset()
 unload - AssetBundle.Unload() AssetBundle.UnloadAsync(bool)
 
 ## Addressable Asset System
-使用weak references
-https://blogs.unity3d.com/2021/03/31/tales-from-the-optimization-trenches-saving-memory-with-addressables/
+[Unity Blog: Addressable打包策略](https://blogs.unity3d.com/2021/03/31/tales-from-the-optimization-trenches-saving-memory-with-addressables/)
+
+Content catalog是一个序列化的ResourceLocationMap(IResourceLocator), 保存address与存放位置(ResourceLocationBase, IResourceLocation)的对象关系, 使用LoadContentCatalogAsync加载;
+每个IResourceLocation里面保存了ResourceProvider的，用ResourceManager.GetResourceProvider获取到对应的provider;
+
