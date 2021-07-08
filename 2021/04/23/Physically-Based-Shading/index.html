@@ -3,14 +3,19 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Archive: 2017 | Game Programming</title>
+    <title>Physically Based Shading | Game Programming</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta property="og:type" content="website">
-<meta property="og:title" content="Game Programming">
-<meta property="og:url" content="http://mtpgm.com/archives/2017/index.html">
+    <meta name="description" content="渲染方程$$L_{o}(p, \omega_{o}) &#x3D; \int_{\Omega}f(p, \omega_{o}, \omega_{i})L_{i}(p, \omega_{i})|\cos\theta_{i}|\mathrm{d}\omega_{i}$$ $L_{o}(p, \omega_{o})$, $L_{i}(p, \omega_{i})$ is radiance.$f(p, \omega">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Physically Based Shading">
+<meta property="og:url" content="http://mtpgm.com/2021/04/23/Physically-Based-Shading/index.html">
 <meta property="og:site_name" content="Game Programming">
+<meta property="og:description" content="渲染方程$$L_{o}(p, \omega_{o}) &#x3D; \int_{\Omega}f(p, \omega_{o}, \omega_{i})L_{i}(p, \omega_{i})|\cos\theta_{i}|\mathrm{d}\omega_{i}$$ $L_{o}(p, \omega_{o})$, $L_{i}(p, \omega_{i})$ is radiance.$f(p, \omega">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-04-23T08:41:39.000Z">
+<meta property="article:modified_time" content="2021-04-25T09:54:01.568Z">
 <meta property="article:author" content="mtpgm">
+<meta property="article:tag" content="Shader">
 <meta name="twitter:card" content="summary">
     
 
@@ -230,45 +235,194 @@ var _hmt = _hmt || [];
 </aside>
 
             
-            <section id="main"><div class="timeline timeline-wrap">
-    
-            <div class="timeline-row timeline-row-major">
-                <span class="node"><i class="fa fa-calendar"></i></span>
-                <h1 class="title">2017</h1>
-            </div>
+            <section id="main"><article id="post-Physically-Based-Shading" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
         
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+        
+            <header class="article-header">
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2017/01/11/tensorflow/">Tensorflow基础</a>
+        <h1 class="article-title" itemprop="name">
+            Physically Based Shading
         </h1>
     
 
-                <div class="article-meta">
-                    
+                
+                    <div class="article-meta">
+                        
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2017/01/11/tensorflow/">
-            <time datetime="2017-01-11T12:51:03.000Z" itemprop="datePublished">2017-01-11</time>
+        <a href="/2021/04/23/Physically-Based-Shading/">
+            <time datetime="2021-04-23T08:41:39.000Z" itemprop="datePublished">2021-04-23</time>
         </a>
     </div>
 
 
-                    
-                    
+                        
+                        
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link-link" href="/tags/deep-learning/" rel="tag">deep learning</a>
+        <a class="tag-link-link" href="/tags/Shader/" rel="tag">Shader</a>
     </div>
 
-                </div>
-            </div>
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="渲染方程"><a href="#渲染方程" class="headerlink" title="渲染方程"></a>渲染方程</h1><p>$$L_{o}(p, \omega_{o}) = \int_{\Omega}f(p, \omega_{o}, \omega_{i})L_{i}(p, \omega_{i})|\cos\theta_{i}|\mathrm{d}\omega_{i}$$</p>
+<p>$L_{o}(p, \omega_{o})$, $L_{i}(p, \omega_{i})$ is radiance.<br>$f(p, \omega_{o}, \omega_{i})$ is BRDF.<br>$\cos\theta_{i}$ is the dot between normal and light direction.</p>
+<span id="more"></span>
+<p>基于物理的着色算法就是计算视线方向的Radiance.<br>Rayleigh scattering - 粒子直径远小于光的波长<br>Mie scattering - 粒子直径与波长相近<br>Geometry scattering - 粒子直径远大于波长</p>
+
+        
         </div>
-    
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
 </div>
+
+    <a data-url="http://mtpgm.com/2021/04/23/Physically-Based-Shading/" data-id="cknu2n42o0000icvif17743xw" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2021/04/23/Physically-Based-Shading/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2021/04/23/Physically-Based-Shading/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2021/03/14/Asset/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">Asset</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2021/04/23/Physically-Based-Shading/" data-title="Physically Based Shading" data-url="http://mtpgm.com/2021/04/23/Physically-Based-Shading/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
 </section>
             
                 <aside id="sidebar">
