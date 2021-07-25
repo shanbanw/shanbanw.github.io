@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <meta charset="utf-8">
+    
+    <title>ShaderLab Syntax | Game Programming</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Syntax1Shader &quot;name&quot; &amp;#123; [Properties] Subshaders [Fallback] [CustomEditor] &amp;#125; []代表可选">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ShaderLab Syntax">
+<meta property="og:url" content="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/index.html">
+<meta property="og:site_name" content="Game Programming">
+<meta property="og:description" content="Syntax1Shader &quot;name&quot; &amp;#123; [Properties] Subshaders [Fallback] [CustomEditor] &amp;#125; []代表可选">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-03-11T06:09:20.000Z">
+<meta property="article:modified_time" content="2021-03-13T16:38:16.679Z">
+<meta property="article:author" content="mtpgm">
+<meta property="article:tag" content="Unity SRP">
+<meta name="twitter:card" content="summary">
+    
+
+    
+        <link rel="alternate" href="/" title="Game Programming" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/zhaoqiao.ico" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?true";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+	<!-- syntaxhighlighter -->
+	<script type="text/javascript" src="/js/shCore.js"></script>
+	<link type="text/css" rel="stylesheet" href="/js/shCore.css"/>
+	<link type="text/css" rel="stylesheet" href="/js/shThemeDefault.css"/>
+	<script type="text/javascript" src="/js/shBrushCpp.js"></script>
+	<script type="text/javascript" src="/js/shBrushPython.js"></script>
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Game Programming</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/qimu.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Posts',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categories',
+            TAGS: 'Tags',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Search" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/qimu.png" />
+            <h2 id="name">shanbanw</h2>
+            <h3 id="title">Algorithm Engineer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Beijing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/shanbanw/">FOLLOW</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                31
+                <span>posts</span>
+            </div>
+            <div class="article-info-block">
+                16
+                <span>tags</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/shanbanw/" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-ShaderLab-Syntax" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            ShaderLab Syntax
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2021/03/11/ShaderLab-Syntax/">
+            <time datetime="2021-03-11T06:09:20.000Z" itemprop="datePublished">2021-03-11</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Unity-SRP/" rel="tag">Unity SRP</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="Syntax"><a href="#Syntax" class="headerlink" title="Syntax"></a>Syntax</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Shader &quot;name&quot; &#123; [Properties] Subshaders [Fallback] [CustomEditor] &#125;</span><br></pre></td></tr></table></figure>
+<p>[]代表可选</p>
+<span id="more"></span>
+
+<h1 id="Properties"><a href="#Properties" class="headerlink" title="Properties"></a>Properties</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Properties &#123; Property [Property] ... &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Numbers-and-Sliders"><a href="#Numbers-and-Sliders" class="headerlink" title="Numbers and Sliders"></a>Numbers and Sliders</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name (&quot;display name&quot;, Range (min, max)) &#x3D; number</span><br><span class="line">name (&quot;display name&quot;, Float) &#x3D; number</span><br><span class="line">name (&quot;display name&quot;, Int) &#x3D; number</span><br></pre></td></tr></table></figure>
+<h4 id="Colors-and-Vectors"><a href="#Colors-and-Vectors" class="headerlink" title="Colors and Vectors"></a>Colors and Vectors</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">name (&quot;display name&quot;, Color) &#x3D; (number, number, number, number)</span><br><span class="line">name (&quot;display name&quot;, Vector) &#x3D; (number, number, number, number)</span><br></pre></td></tr></table></figure>
+<h4 id="Textures"><a href="#Textures" class="headerlink" title="Textures"></a>Textures</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">name (&quot;display name&quot;, 2D) &#x3D; &quot;defaulttexture&quot; &#123;&#125;</span><br><span class="line">name (&quot;display name&quot;, Cube) &#x3D; &quot;defaulttexture&quot; &#123;&#125;</span><br><span class="line">name (&quot;display name&quot;, 3D) &#x3D; &quot;defaulttexture&quot; &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h4><ul>
+<li>unity中shader property name一般以_开头。</li>
+<li>2D Textures - 默认值可以是空字符串，或是built-in 默认贴图: “white”, “black”, “gray”, “bump” (RGBA: 0.5, 0.5, 1, 0.5) and “red” (RGBA: 1, 0, 0, 0).</li>
+<li>Non-2D Textures (Cube, 3D, 2DArray) - 默认值是空字符串。</li>
+</ul>
+<p>Properties里面的参数是和材质数据一起序列化的，外面的参数不会被保存，用于runtime脚本控制(such as Material.SetFloat)</p>
+<h4 id="Property-attributes-and-drawers"><a href="#Property-attributes-and-drawers" class="headerlink" title="Property attributes and drawers"></a>Property attributes and drawers</h4><ul>
+<li>[HideInInspector] - 不出现在material inspector</li>
+<li>[NoScaleOffset] - 不显示Texture tiling/offset</li>
+<li>[Normal] - normal map</li>
+<li>[HDR] - high-dynamic range (HDR) texture</li>
+<li>[Gamma] </li>
+<li>[PerRendererData] - come from pre-renderer data, read-only</li>
+<li>[MainTexture] - unity默认使用_MainTex作为main texture,如果有多个，unity使用第一个。</li>
+<li>[MainColor] - unity默认使用_Color作为main color,如果有多个，unity使用第一个。</li>
+</ul>
+<h1 id="SubShaders-amp-Fallback"><a href="#SubShaders-amp-Fallback" class="headerlink" title="SubShaders &amp; Fallback"></a>SubShaders &amp; Fallback</h1><p>每个shader可以有多个subshaders. 当Unity加载shader时，会从subshaders中找到第一个机器支持的subshader，如果没有，就会使用fall back shader.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subshader &#123; [Tags] [CommonState] Passdef [Passdef] ...&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="SubShader-Tags-to-tell-how-and-when-they-expect-to-be-rendered-to-the-rendering-engine"><a href="#SubShader-Tags-to-tell-how-and-when-they-expect-to-be-rendered-to-the-rendering-engine" class="headerlink" title="SubShader Tags - to tell how and when they expect to be rendered to the rendering engine."></a>SubShader Tags - to tell how and when they expect to be rendered to the rendering engine.</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tags &#123; &quot;TagName1&quot; &#x3D; &quot;Value1&quot; &quot;TagName2&quot; &#x3D; &quot;Value2&quot; &#125;</span><br></pre></td></tr></table></figure>
+<p>以下tags必须放在subshader中， 不能Pass中</p>
+<ul>
+<li><h4 id="Queue-Rendering-Order"><a href="#Queue-Rendering-Order" class="headerlink" title="Queue - Rendering Order"></a>Queue - Rendering Order</h4><ul>
+<li>Background - 1000</li>
+<li>Geometry - 2000</li>
+<li>AlphaTest - 2450</li>
+<li>Transparent - 3000</li>
+<li>Overlay - 4000</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tags &#123; &quot;Queue&quot; &#x3D; &quot;Geometry+1&quot; &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><h4 id="DisableBatching-draw-call-batching-transforms-all-geometry-into-world-space"><a href="#DisableBatching-draw-call-batching-transforms-all-geometry-into-world-space" class="headerlink" title="DisableBatching - draw call batching transforms all geometry into world space"></a>DisableBatching - draw call batching transforms all geometry into world space</h4><ul>
+<li>True - always disables batching for this shader</li>
+<li>False - does not disable batching; default</li>
+<li>LODFading - disable batching when LOD fading is active; mostly used on trees</li>
+</ul>
+</li>
+<li><h4 id="ForceNoShadowCasting"><a href="#ForceNoShadowCasting" class="headerlink" title="ForceNoShadowCasting"></a>ForceNoShadowCasting</h4><ul>
+<li>True - an object that is rendered using this subshader will never cast shadows.</li>
+</ul>
+</li>
+<li><h4 id="IgnoreProjector"><a href="#IgnoreProjector" class="headerlink" title="IgnoreProjector"></a>IgnoreProjector</h4><ul>
+<li>True - will not be effected by Projectors.</li>
+</ul>
+</li>
+<li><h4 id="CanUseSpriteAltas"><a href="#CanUseSpriteAltas" class="headerlink" title="CanUseSpriteAltas"></a>CanUseSpriteAltas</h4><ul>
+<li>False - meant for sprites, not work when they are packed into atlases</li>
+</ul>
+</li>
+<li><h4 id="PreviewType-how-the-material-inspector-preview-should-display-the-material"><a href="#PreviewType-how-the-material-inspector-preview-should-display-the-material" class="headerlink" title="PreviewType - how the material inspector preview should display the material."></a>PreviewType - how the material inspector preview should display the material.</h4><ul>
+<li>Sphere - default</li>
+<li>Plane - 2D</li>
+<li>Skybox - skybox</li>
+</ul>
+</li>
+<li><h4 id="RenderType-Categorize-shaders-into-several-perdefined-groups-used-by-shader-replacement"><a href="#RenderType-Categorize-shaders-into-several-perdefined-groups-used-by-shader-replacement" class="headerlink" title="RenderType - Categorize shaders into several perdefined groups, used by shader replacement."></a>RenderType - Categorize shaders into several perdefined groups, used by shader replacement.</h4><ul>
+<li>Opaque</li>
+<li>Transparent</li>
+<li>TransparentCutout - masked transparency shaders</li>
+<li>Background - skybox</li>
+<li>Overlay - Halo, flare shaders</li>
+<li>TreeOpaque - terrain engine tree bark</li>
+<li>TreeTransparentCutout - terrain engine billboarded trees</li>
+<li>Grass - terrain engine grass</li>
+<li>GrassBillboard - terrain engine billboarded grass</li>
+</ul>
+</li>
+</ul>
+<h4 id="Any-statements-that-are-allowed-in-a-Pass-definition-can-also-appear-in-Subshader-block-This-will-make-all-passes-use-this-“shared”-state"><a href="#Any-statements-that-are-allowed-in-a-Pass-definition-can-also-appear-in-Subshader-block-This-will-make-all-passes-use-this-“shared”-state" class="headerlink" title="Any statements that are allowed in a Pass definition can also appear in Subshader block. This will make all passes use this “shared” state."></a>Any statements that are allowed in a Pass definition can also appear in Subshader block. This will make all passes use this “shared” state.</h4><ul>
+<li>Three Type of Pass<ul>
+<li>Regular Pass</li>
+<li>Use Pass</li>
+<li>Grab Pass</li>
+</ul>
+</li>
+</ul>
+<h4 id="Regular-Pass"><a href="#Regular-Pass" class="headerlink" title="Regular Pass"></a>Regular Pass</h4><p>每个pass渲染一次geometry</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Pass &#123; [Name and Tags] [RenderSetup] &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Name"><a href="#Name" class="headerlink" title="Name"></a>Name</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Name &quot;PASSNAME&quot;</span><br></pre></td></tr></table></figure>
+<p>定义一个名字，一般用大写，用于UsePass</p>
+<h4 id="Tags"><a href="#Tags" class="headerlink" title="Tags"></a>Tags</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tags &#123; &quot;TagName1&quot; &#x3D; &quot;Value1&quot; &quot;TagName2&quot; &#x3D; &quot;Value2&quot; &#125;</span><br></pre></td></tr></table></figure>
+<p>用于确定渲染方式和渲染时间<br>以下Tags必须放在Pass中，不能放在SubShader中</p>
+<ul>
+<li><h4 id="LightMode"><a href="#LightMode" class="headerlink" title="LightMode"></a>LightMode</h4><ul>
+<li>Always - Always rendered; no lighting is applied.</li>
+<li>ForwardBase - Used in Forward rendering, ambient, main directional light, vertex/SH lights and lightmaps are applied.</li>
+<li>ForwardAdd - Used in Forward rendering; additive per-pixel lights are applied, one pass per light.</li>
+<li>Deferred - Used in Deferred Shading; renders g-buffer.</li>
+<li>ShadowCaster - Renders object depth into shadowmap or a depth texture.</li>
+<li>MotionVectors - Used to calculate per-object motion vectors.</li>
+</ul>
+</li>
+<li><h4 id="PassFlags-指定rendering-pipeline如何给pass传递数据"><a href="#PassFlags-指定rendering-pipeline如何给pass传递数据" class="headerlink" title="PassFlags - 指定rendering pipeline如何给pass传递数据"></a>PassFlags - 指定rendering pipeline如何给pass传递数据</h4><ul>
+<li>OnlyDirectional - only the main directional light and ambient/lightprobe data is passed into shader.</li>
+</ul>
+</li>
+<li><h4 id="RequireOptions-指定满足某些条件时才渲染"><a href="#RequireOptions-指定满足某些条件时才渲染" class="headerlink" title="RequireOptions - 指定满足某些条件时才渲染"></a>RequireOptions - 指定满足某些条件时才渲染</h4><ul>
+<li>SoftVegetation - Render this pass only if Soft Vegetation is on in the quality window.</li>
+</ul>
+</li>
+</ul>
+<h4 id="Render-State-Set-up"><a href="#Render-State-Set-up" class="headerlink" title="Render State Set-up"></a>Render State Set-up</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; Set polygon culling mode</span><br><span class="line">Cull Back | Front | Off</span><br><span class="line">&#x2F;&#x2F; Set depth buffer testing mode, default (LEqual)</span><br><span class="line">ZTest (Less | Greater | LEqual | GEqual | Equal | NotEqual | Always)</span><br><span class="line">&#x2F;&#x2F; Set depth buffer writing mode, default (On)</span><br><span class="line">ZWrite On | Off</span><br><span class="line">&#x2F;&#x2F; Set Z buffer depth offset, Factor scales the maximum Z slope, with respect to X or Y of the polygon; units scale the minimum resolvable depth buffer value.</span><br><span class="line">Offset Factor, Units</span><br><span class="line">&#x2F;&#x2F; Sets alpha blending, alpha operation, and alpha-to-coverage modes</span><br><span class="line">Blend sourceBlendMode destBlendMode</span><br><span class="line">Blend sourceBlendMode destBlendMode, alphaSourceBlendMode alphaDestBlendMode</span><br><span class="line">BlendOp colorOp</span><br><span class="line">BlendOp colorOp, alphaOp</span><br><span class="line">AlphaToMask On | Off</span><br><span class="line">&#x2F;&#x2F; Set conservative rasterization on and off</span><br><span class="line">Conservative True | False</span><br><span class="line">&#x2F;&#x2F; Set color channel writing mask. Writing ColorMask 0 turns off rendering to all color channels. Default mode is writing to all channels (RGBA), but for some special effects you might want to leave certain channels unmodified, or disable color writes completely.</span><br><span class="line"></span><br><span class="line">When using multiple render target (MRT) rendering, it is possible to set up different color masks for each render target, by adding index (0–7) at the end. For example, ColorMask RGB 3 would make render target #3 write only to RGB channels.</span><br><span class="line"></span><br><span class="line">ColorMask RGB | A | 0 | any combination of R, G, B, A</span><br></pre></td></tr></table></figure>
+<h4 id="Debugging-Normals"><a href="#Debugging-Normals" class="headerlink" title="Debugging Normals"></a>Debugging Normals</h4><p>first we render the object with normal vertex lighting, then we render the backfaces in bright pink. This has the effects of highlighting anywhere your normals need to be flipped.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">Shader &quot;Reveal Backfaces&quot; &#123;</span><br><span class="line">    Properties &#123;</span><br><span class="line">        _MainTex (&quot;Base (RGB)&quot;, 2D) &#x3D; &quot;white&quot; &#123; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    SubShader &#123;</span><br><span class="line">        &#x2F;&#x2F; Render the front-facing parts of the object.</span><br><span class="line">        &#x2F;&#x2F; We use a simple white material, and apply the main texture.</span><br><span class="line">        Pass &#123;</span><br><span class="line">            Material &#123;</span><br><span class="line">                Diffuse (1,1,1,1)</span><br><span class="line">            &#125;</span><br><span class="line">            Lighting On</span><br><span class="line">            SetTexture [_MainTex] &#123;</span><br><span class="line">                Combine Primary * Texture</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; Now we render the back-facing triangles in the most</span><br><span class="line">        &#x2F;&#x2F; irritating color in the world: BRIGHT PINK!</span><br><span class="line">        Pass &#123;</span><br><span class="line">            Color (1,0,1,1)</span><br><span class="line">            Cull Front</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id=""><a href="#" class="headerlink" title=""></a></h4>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/" data-id="cknlxu5zq0002ygwp34ga9d0s" class="article-share-link"><i class="fa fa-share"></i>Share</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/#comments" class="article-comment-link ds-thread-count" data-thread-key="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/">Comments</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2021/03/14/Asset/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Newer</strong>
+            <div class="article-nav-title">
+                
+                    Asset
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2021/03/10/Scriptable-Render-Pipeline/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Older</strong>
+            <div class="article-nav-title">Scriptable Render Pipeline</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    <section id="comments">
+    
+        
+    <div class="ds-thread" data-thread-key="2021/03/11/ShaderLab-Syntax/" data-title="ShaderLab Syntax" data-url="http://mtpgm.com/2021/03/11/ShaderLab-Syntax/"></div>
+    <style>
+        #ds-thread #ds-reset .ds-textarea-wrapper {
+            background: none;
+        }
+        #ds-reset .ds-avatar img {
+            box-shadow: none;
+        }
+        #ds-reset .ds-gradient-bg {
+            background: #f7f7f7;
+        }
+        #ds-thread #ds-reset li.ds-tab a {
+            border-radius: 3px;
+        }
+        #ds-thread #ds-reset .ds-post-button {
+            color: white;
+            border: none;
+            box-shadow: none;
+            background: #d32;
+            text-shadow: none;
+            font-weight: normal;
+            font-family: 'Microsoft Yahei';
+        }
+        #ds-thread #ds-reset .ds-post-button:hover {
+            color: white;
+            background: #DE594C;
+        }
+        #ds-thread #ds-reset .ds-post-button:active {
+            background: #d32;
+        }
+        #ds-smilies-tooltip ul.ds-smilies-tabs li a.ds-current {
+            color: white;
+            background: #d32;
+            box-shadow: none;
+            text-shadow: none;
+            font-weight: normal;
+        }
+    </style>
+
+    
+    </section>
+
+</section>
+            
+                <aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">recent</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/23/Physically-Based-Shading/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/04/23/Physically-Based-Shading/" class="title">Physically Based Shading</a></p>
+                            <p class="item-date"><time datetime="2021-04-23T08:41:39.000Z" itemprop="datePublished">2021-04-23</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/04/18/Unity-Performance-Testing/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/04/18/Unity-Performance-Testing/" class="title">性能测试</a></p>
+                            <p class="item-date"><time datetime="2021-04-17T16:09:24.000Z" itemprop="datePublished">2021-04-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/03/14/Asset/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/14/Asset/" class="title">Asset</a></p>
+                            <p class="item-date"><time datetime="2021-03-14T10:26:03.000Z" itemprop="datePublished">2021-03-14</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/03/11/ShaderLab-Syntax/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/11/ShaderLab-Syntax/" class="title">ShaderLab Syntax</a></p>
+                            <p class="item-date"><time datetime="2021-03-11T06:09:20.000Z" itemprop="datePublished">2021-03-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2021/03/10/Scriptable-Render-Pipeline/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2021/03/10/Scriptable-Render-Pipeline/" class="title">Scriptable Render Pipeline</a></p>
+                            <p class="item-date"><time datetime="2021-03-10T08:57:02.000Z" itemprop="datePublished">2021-03-10</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">archives</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">April 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">March 2021</a><span class="archive-list-count">20</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/08/">August 2015</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/06/">June 2015</a><span class="archive-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tags</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Behaviour-Pattern/" rel="tag">Behaviour Pattern</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C-C/" rel="tag">C/C++</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Creational-Design-Pattern/" rel="tag">Creational Design Pattern</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Decoupling-Pattern/" rel="tag">Decoupling Pattern</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Optimization-Pattern/" rel="tag">Optimization Pattern</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Profiling-Performance/" rel="tag">Profiling Performance</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Shader/" rel="tag">Shader</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Structural-Pattern/" rel="tag">Structural Pattern</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unity/" rel="tag">Unity</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unity-SRP/" rel="tag">Unity SRP</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/data-visualization/" rel="tag">data visualization</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deep-learning/" rel="tag">deep learning</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/neuroscience/" rel="tag">neuroscience</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" rel="tag">数据挖掘</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag">机器学习</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" rel="tag">测度论</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">tag cloud</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Behaviour-Pattern/" style="font-size: 20px;">Behaviour Pattern</a> <a href="/tags/C-C/" style="font-size: 12.5px;">C/C++</a> <a href="/tags/Creational-Design-Pattern/" style="font-size: 17.5px;">Creational Design Pattern</a> <a href="/tags/Decoupling-Pattern/" style="font-size: 15px;">Decoupling Pattern</a> <a href="/tags/Optimization-Pattern/" style="font-size: 12.5px;">Optimization Pattern</a> <a href="/tags/Profiling-Performance/" style="font-size: 10px;">Profiling Performance</a> <a href="/tags/Shader/" style="font-size: 10px;">Shader</a> <a href="/tags/Structural-Pattern/" style="font-size: 15px;">Structural Pattern</a> <a href="/tags/Unity/" style="font-size: 10px;">Unity</a> <a href="/tags/Unity-SRP/" style="font-size: 12.5px;">Unity SRP</a> <a href="/tags/data-visualization/" style="font-size: 10px;">data visualization</a> <a href="/tags/deep-learning/" style="font-size: 10px;">deep learning</a> <a href="/tags/neuroscience/" style="font-size: 10px;">neuroscience</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98/" style="font-size: 10px;">数据挖掘</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 12.5px;">机器学习</a> <a href="/tags/%E6%B5%8B%E5%BA%A6%E8%AE%BA/" style="font-size: 10px;">测度论</a>
+        </div>
+    </div>
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2021 mtpgm<br>
+        </div>
+    </div>
+</footer>
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+        
+    
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'true'};
+    (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
